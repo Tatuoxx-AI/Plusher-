@@ -1,0 +1,6 @@
+# dados da loja, encomendas e credenciais — nunca publicar
+data/
+node_modules/
+.vercel/
+*.tmp
+.env*

@@ -1,0 +1,17 @@
+{
+  "name": "plusher-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Loja PLUSHER — site + servidor (local ou Vercel)",
+  "main": "server.js",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "acesso": "node scripts/definir-acesso.js"
+  },
+  "dependencies": {
+    "@vercel/blob": "2.8.1"
+  }
+}
