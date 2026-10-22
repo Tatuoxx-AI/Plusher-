@@ -420,6 +420,23 @@ footer.foot{background:var(--paper);border-top:1px solid rgba(255,255,255,.06);p
 .afoot .st{font-size:12px;color:var(--txt2);margin-right:auto}
 .afoot .st.dirty{color:var(--acc)}
 
+/* ===================== ESCOLHA DE IDIOMA ===================== */
+.lang-gate{position:fixed;inset:0;z-index:200;background:var(--bg);display:grid;place-items:center;padding:24px;overflow:auto;opacity:0;transition:opacity .5s var(--ease)}
+.lang-gate.on{opacity:1}
+.lang-gate:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 38%,rgba(250,255,0,.14),transparent 62%);pointer-events:none}
+.lg-in{position:relative;width:min(520px,100%);text-align:center;transform:translateY(18px);transition:transform .7s var(--ease)}
+.lang-gate.on .lg-in{transform:none}
+.lg-logo{display:block;width:min(320px,72vw);height:58px;margin:0 auto 24px;background:url(plusher-logo.png) center/112% auto no-repeat}
+.lg-t{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--txt2);line-height:1.9;margin-bottom:26px}
+.lg-list{display:grid;gap:8px}
+.lg-list button{display:flex;align-items:center;gap:16px;height:58px;padding:0 18px;border:1px solid rgba(255,255,255,.16);color:#fff;text-align:left;transition:background .25s,color .25s,border-color .25s,transform .35s var(--ease)}
+.lg-list button b{font-family:var(--fh);font-weight:900;font-size:15px;width:44px;color:var(--acc);transition:color .25s}
+.lg-list button span{font-size:15px;font-weight:500}
+.lg-list button:hover,.lg-list button:focus-visible{background:var(--acc);color:#000;border-color:var(--acc);outline:none;transform:translateX(4px)}
+.lg-list button:hover b,.lg-list button:focus-visible b{color:#000}
+.lg-list button.cur{border-color:var(--acc)}
+.nav .pill.lang{min-width:44px;font-weight:700;letter-spacing:.06em}
+
 /* ===================== WHATSAPP + CHAT DE AJUDA ===================== */
 .fab{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
 .fab a,.fab button{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;box-shadow:0 10px 26px rgba(0,0,0,.35);transition:transform .35s var(--ease)}
@@ -550,6 +567,7 @@ body.has3d .marquee{position:relative;z-index:4}
     <a class="pill hide-m" href="#drop">Drops</a>
     <a class="pill hide-m" href="#sobre">Sobre</a>
     <a class="pill" href="#catalogo" data-only-m style="display:none">Loja</a>
+    <button class="pill lang" id="langBtn" type="button" aria-label="Idioma">EN</button>
     <a class="pill dark" href="#saco">Saco<span class="n" id="navCount">0</span></a>
   </nav>
 </header>
@@ -621,7 +639,7 @@ body.has3d .marquee{position:relative;z-index:4}
     <div class="cat-head">
       <div>
         <p class="eyebrow">Coleção</p>
-        <h2>O <em>catá</em>logo</h2>
+        <h2 id="catTitle">O <em>catá</em>logo</h2>
       </div>
       <div class="chips" id="chips" role="tablist" aria-label="Filtrar por categoria"></div>
     </div>
@@ -802,6 +820,15 @@ body.has3d .marquee{position:relative;z-index:4}
 </div>
 
 <!-- ===================== WHATSAPP + CHAT DE AJUDA ===================== -->
+<!-- ===================== ESCOLHA DE IDIOMA ===================== -->
+<div class="lang-gate" id="langGate" role="dialog" aria-modal="true" aria-labelledby="lgT" hidden>
+  <div class="lg-in">
+    <span class="lg-logo" aria-hidden="true"></span>
+    <p class="lg-t" id="lgT" data-noi18n>Choose your language<br>Escolha seu idioma · Elige tu idioma<br>Choisis ta langue · Wähle deine Sprache</p>
+    <div class="lg-list" id="lgList" data-noi18n></div>
+  </div>
+</div>
+
 <div class="fab">
   <a class="wa" id="waFab" target="_blank" rel="noopener" aria-label="Falar connosco no WhatsApp"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 2s.8 2.3.9 2.5c.1.2 1.6 2.5 4 3.5 1.5.6 2.1.7 2.8.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg></a>
   <button class="ch" id="chatFab" aria-label="Abrir o chat de ajuda" aria-expanded="false" aria-controls="chat"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/></svg><span class="dot" id="chatDot"></span></button>
@@ -918,10 +945,324 @@ async function api(url, opts = {}){
   return data;
 }
 
+/* ===================== IDIOMAS ===================== */
+/* O site escolhe o idioma à entrada (guardado neste navegador). As traduções usam como chave o texto
+   português original: um texto que não esteja no dicionário (ex.: uma descrição nova editada no painel)
+   aparece tal como foi escrito. O painel do gerente fica sempre em português. */
+const LANGS = { en:['EN','English'], 'pt-BR':['PT','Português (Brasil)'], es:['ES','Español'], fr:['FR','Français'], de:['DE','Deutsch'] };
+const LANG_ORDER = ['en','pt-BR','es','fr','de'];
+const LOCALES = { en:'en-IE', 'pt-BR':'pt-BR', es:'es-ES', fr:'fr-FR', de:'de-DE' };
+const LANG_SAVED = (() => { try { const l = localStorage.getItem('plusher_lang'); return LANGS[l] ? l : null; } catch { return null; } })();
+const LANG = LANG_SAVED || (() => {
+  for (const n of (navigator.languages || [navigator.language || ''])){
+    const s = String(n).toLowerCase();
+    if (s.startsWith('pt')) return 'pt-BR';
+    for (const l of ['es','fr','de','en']) if (s.startsWith(l)) return l;
+  }
+  return 'en';
+})();
+const LOCALE = LOCALES[LANG];
+document.documentElement.lang = LANG;
+
+// [en, pt-BR, es, fr, de] — chave = texto português original
+const TR = {
+  // menu e topo
+  "Loja":["Shop","Loja","Tienda","Boutique","Shop"],
+  "Sobre":["About","Sobre","Nosotros","À propos","Über uns"],
+  "Saco":["Bag","Sacola","Bolsa","Panier","Tasche"],
+  "Menu principal":["Main menu","Menu principal","Menú principal","Menu principal","Hauptmenü"],
+  "Anúncio":["Announcement","Anúncio","Anuncio","Annonce","Ankündigung"],
+  "PLUSHER — início":["PLUSHER — home","PLUSHER — início","PLUSHER — inicio","PLUSHER — accueil","PLUSHER — Start"],
+  "Idioma":["Language","Idioma","Idioma","Langue","Sprache"],
+  "TESTA O MOVIMENTO":["TEST THE MOTION","TESTE O MOVIMENTO","PRUEBA EL MOVIMIENTO","TESTE LE MOUVEMENT","TESTE DIE BEWEGUNG"],
+  "Testa o movimento":["Test the motion","Teste o movimento","Prueba el movimiento","Teste le mouvement","Teste die Bewegung"],
+  "Intensidade":["Intensity","Intensidade","Intensidad","Intensité","Intensität"],
+  "Velocidade":["Speed","Velocidade","Velocidad","Vitesse","Tempo"],
+  "Tamanho":["Size","Tamanho","Talla","Taille","Größe"],
+  "Pausar animação":["Pause animation","Pausar animação","Pausar animación","Mettre en pause","Animation pausieren"],
+  "Retomar animação":["Resume animation","Retomar animação","Reanudar animación","Reprendre l'animation","Animation fortsetzen"],
+  "ENERGIA EM":["ENERGY IN","ENERGIA EM","ENERGÍA EN","ÉNERGIE EN","ENERGIE IN"],
+  "MOVIMENTO":["MOTION","MOVIMENTO","MOVIMIENTO","MOUVEMENT","BEWEGUNG"],
+  "Vestimos quem":["We dress those","Vestimos quem","Vestimos a quien","On habille ceux","Wir kleiden alle,"],
+  "nunca para":["who never stop","nunca para","nunca para","qui ne s'arrêtent jamais","die nie stillstehen"],
+  "Ver coleção":["See collection","Ver coleção","Ver colección","Voir la collection","Kollektion ansehen"],
+  "Ver catálogo":["See catalog","Ver catálogo","Ver catálogo","Voir le catalogue","Katalog ansehen"],
+  "Streetwear premium feito em Portugal. Tecido pesado, corte oversize.":["Premium streetwear made in Portugal. Heavyweight fabric, oversized fit.","Streetwear premium feito em Portugal. Tecido pesado, corte oversized.","Streetwear premium hecho en Portugal. Tejido grueso, corte oversize.","Streetwear premium fabriqué au Portugal. Tissu épais, coupe oversize.","Premium-Streetwear aus Portugal. Schwerer Stoff, Oversize-Schnitt."],
+  "Cada peça é desenhada para quem se move, para quem não para.":["Every piece is designed for those who move, for those who never stop.","Cada peça é desenhada para quem se move, para quem não para.","Cada prenda está diseñada para quien se mueve, para quien no para.","Chaque pièce est pensée pour ceux qui bougent, qui ne s'arrêtent jamais.","Jedes Teil ist für alle gemacht, die sich bewegen und nie stillstehen."],
+  "Feito para o movimento":["Made for motion","Feito para o movimento","Hecho para el movimiento","Fait pour le mouvement","Gemacht für Bewegung"],
+  "Hoodies 450gsm, t-shirts oversize e drops limitados.":["450gsm hoodies, oversized tees and limited drops.","Hoodies 450gsm, camisetas oversized e drops limitados.","Hoodies de 450gsm, camisetas oversize y drops limitados.","Hoodies 450 g/m², t-shirts oversize et drops limités.","450-gsm-Hoodies, Oversize-Tees und limitierte Drops."],
+  "A CARREGAR 3D…":["LOADING 3D…","CARREGANDO 3D…","CARGANDO 3D…","CHARGEMENT 3D…","3D WIRD GELADEN…"],
+  // destaques e catálogo
+  "ESPECIFICAÇÕES":["SPECS","ESPECIFICAÇÕES","ESPECIFICACIONES","CARACTÉRISTIQUES","DETAILS"],
+  "Adicionar ao saco":["Add to bag","Adicionar à sacola","Añadir a la bolsa","Ajouter au panier","In die Tasche"],
+  "VISTA":["VIEW","VISTA","VISTA","VUE","ANSICHT"],
+  "COLEÇÃO":["COLLECTION","COLEÇÃO","COLECCIÓN","COLLECTION","KOLLEKTION"],
+  "Coleção":["Collection","Coleção","Colección","Collection","Kollektion"],
+  "O <em>catá</em>logo":["The <em>cata</em>log","O <em>catá</em>logo","El <em>catá</em>logo","Le <em>cata</em>logue","Der <em>Kata</em>log"],
+  "Filtrar por categoria":["Filter by category","Filtrar por categoria","Filtrar por categoría","Filtrer par catégorie","Nach Kategorie filtern"],
+  "SCROLL ↓ PARA PERCORRER":["SCROLL ↓ TO BROWSE","ROLE ↓ PARA VER","DESLIZA ↓ PARA VER","DÉFILE ↓ POUR PARCOURIR","SCROLLE ↓ ZUM DURCHBLÄTTERN"],
+  "Todos":["All","Todos","Todos","Tous","Alle"],
+  "EM BREVE":["COMING SOON","EM BREVE","PRÓXIMAMENTE","BIENTÔT","DEMNÄCHST"],
+  "Em breve":["Coming soon","Em breve","Próximamente","Bientôt","Demnächst"],
+  "em breve":["coming soon","em breve","próximamente","bientôt","demnächst"],
+  "DESTAQUE":["FEATURED","DESTAQUE","DESTACADO","À LA UNE","HIGHLIGHT"],
+  "+ Adicionar rápido":["+ Quick add","+ Adicionar rápido","+ Añadir rápido","+ Ajout rapide","+ Schnell hinzufügen"],
+  "Fim da coleção":["End of the collection","Fim da coleção","Fin de la colección","Fin de la collection","Ende der Kollektion"],
+  "Não para.":["Don't stop.","Não pare.","No pares.","Ne t'arrête pas.","Hör nicht auf."],
+  "Continua.":["Keep going.","Continue.","Sigue.","Continue.","Mach weiter."],
+  "Próximo drop":["Next drop","Próximo drop","Próximo drop","Prochain drop","Nächster Drop"],
+  "{a} DISPONÍVEIS · {b} EM BREVE":["{a} AVAILABLE · {b} COMING SOON","{a} DISPONÍVEIS · {b} EM BREVE","{a} DISPONIBLES · {b} PRÓXIMAMENTE","{a} DISPONIBLES · {b} BIENTÔT","{a} VERFÜGBAR · {b} DEMNÄCHST"],
+  // marca e categorias
+  "Sobre nós":["About us","Sobre nós","Sobre nosotros","À propos","Über uns"],
+  "A marca":["The brand","A marca","La marca","La marque","Die Marke"],
+  "PLUSHER — a marca":["PLUSHER — the brand","PLUSHER — a marca","PLUSHER — la marca","PLUSHER — la marque","PLUSHER — die Marke"],
+  "Explorar":["Explore","Explorar","Explorar","Explorer","Entdecken"],
+  "Categorias":["Categories","Categorias","Categorías","Catégories","Kategorien"],
+  "Encontra o teu estilo":["Find your style","Encontre seu estilo","Encuentra tu estilo","Trouve ton style","Finde deinen Stil"],
+  "Ver coleção →":["See collection →","Ver coleção →","Ver colección →","Voir la collection →","Kollektion ansehen →"],
+  // drop
+  "PRÓXIMO DROP":["NEXT DROP","PRÓXIMO DROP","PRÓXIMO DROP","PROCHAIN DROP","NÄCHSTER DROP"],
+  "DIAS":["DAYS","DIAS","DÍAS","JOURS","TAGE"],
+  "HORAS":["HOURS","HORAS","HORAS","HEURES","STD"],
+  "SEG":["SEC","SEG","SEG","SEC","SEK"],
+  "Avisa-me no lançamento":["Notify me at launch","Me avise no lançamento","Avísame en el lanzamiento","Préviens-moi au lancement","Benachrichtige mich zum Launch"],
+  "DISPONÍVEL":["AVAILABLE","DISPONÍVEL","DISPONIBLE","DISPONIBLE","VERFÜGBAR"],
+  "O DROP JÁ SAIU":["THE DROP IS OUT","O DROP JÁ SAIU","EL DROP YA SALIÓ","LE DROP EST SORTI","DER DROP IST DA"],
+  // janela da peça
+  "Fechar":["Close","Fechar","Cerrar","Fermer","Schließen"],
+  "EM BREVE — INDISPONÍVEL DE MOMENTO":["COMING SOON — NOT AVAILABLE YET","EM BREVE — INDISPONÍVEL NO MOMENTO","PRÓXIMAMENTE — AÚN NO DISPONIBLE","BIENTÔT — PAS ENCORE DISPONIBLE","DEMNÄCHST — NOCH NICHT VERFÜGBAR"],
+  "Seleciona um tamanho":["Choose a size","Selecione um tamanho","Elige una talla","Choisis une taille","Wähle eine Größe"],
+  // saco
+  "PRONTO PARA O PRÓXIMO PASSO":["READY FOR THE NEXT STEP","PRONTO PARA O PRÓXIMO PASSO","LISTO PARA EL PRÓXIMO PASO","PRÊT POUR LA SUITE","BEREIT FÜR DEN NÄCHSTEN SCHRITT"],
+  "Voltar ao catálogo":["Back to catalog","Voltar ao catálogo","Volver al catálogo","Retour au catalogue","Zurück zum Katalog"],
+  "O teu saco":["Your bag","Sua sacola","Tu bolsa","Ton panier","Deine Tasche"],
+  "O teu saco está vazio.":["Your bag is empty.","Sua sacola está vazia.","Tu bolsa está vacía.","Ton panier est vide.","Deine Tasche ist leer."],
+  "O teu saco está vazio":["Your bag is empty","Sua sacola está vazia","Tu bolsa está vacía","Ton panier est vide","Deine Tasche ist leer"],
+  "O saco está vazio":["Your bag is empty","Sua sacola está vazia","Tu bolsa está vacía","Ton panier est vide","Deine Tasche ist leer"],
+  "Tens {n} peça pronta para o próximo passo.":["You have {n} item ready for the next step.","Você tem {n} peça pronta para o próximo passo.","Tienes {n} prenda lista para el siguiente paso.","Tu as {n} article prêt pour la suite.","Du hast {n} Artikel bereit für den nächsten Schritt."],
+  "Tens {n} peças prontas para o próximo passo.":["You have {n} items ready for the next step.","Você tem {n} peças prontas para o próximo passo.","Tienes {n} prendas listas para el siguiente paso.","Tu as {n} articles prêts pour la suite.","Du hast {n} Artikel bereit für den nächsten Schritt."],
+  "PEÇA":["ITEM","PEÇA","ARTÍCULO","ARTICLE","ARTIKEL"],
+  "QUANTIDADE":["QUANTITY","QUANTIDADE","CANTIDAD","QUANTITÉ","MENGE"],
+  "TOTAL":["TOTAL","TOTAL","TOTAL","TOTAL","GESAMT"],
+  "Total":["Total","Total","Total","Total","Gesamt"],
+  "Subtotal":["Subtotal","Subtotal","Subtotal","Sous-total","Zwischensumme"],
+  "Desconto":["Discount","Desconto","Descuento","Réduction","Rabatt"],
+  "Envio":["Shipping","Frete","Envío","Livraison","Versand"],
+  "Grátis":["Free","Grátis","Gratis","Gratuit","Kostenlos"],
+  "A calcular":["To be calculated","A calcular","Por calcular","À calculer","Wird berechnet"],
+  "Cupão":["Coupon","Cupom","Cupón","Code promo","Gutschein"],
+  "Código de cupão":["Coupon code","Código do cupom","Código de cupón","Code promo","Gutscheincode"],
+  "Aplicar":["Apply","Aplicar","Aplicar","Appliquer","Einlösen"],
+  "Menos":["Less","Menos","Menos","Moins","Weniger"],
+  "Mais":["More","Mais","Más","Plus","Mehr"],
+  "Remover":["Remove","Remover","Quitar","Retirer","Entfernen"],
+  "Ainda nada aqui":["Nothing here yet","Nada aqui ainda","Aún no hay nada","Rien pour l'instant","Noch nichts hier"],
+  "Escolhe as tuas peças no":["Pick your pieces in the","Escolha suas peças no","Elige tus prendas en el","Choisis tes pièces dans le","Wähle deine Teile im"],
+  "catálogo":["catalog","catálogo","catálogo","catalogue","Katalog"],
+  "Do primeiro passo ao próximo drop.":["From the first step to the next drop.","Do primeiro passo ao próximo drop.","Del primer paso al próximo drop.","Du premier pas au prochain drop.","Vom ersten Schritt bis zum nächsten Drop."],
+  "{nome} ({size}) adicionado":["{nome} ({size}) added","{nome} ({size}) adicionado","{nome} ({size}) añadido","{nome} ({size}) ajouté","{nome} ({size}) hinzugefügt"],
+  "Cupão inválido":["Invalid coupon","Cupom inválido","Cupón no válido","Code invalide","Ungültiger Gutschein"],
+  "Cupão {code} aplicado: −{pct}%":["Coupon {code} applied: −{pct}%","Cupom {code} aplicado: −{pct}%","Cupón {code} aplicado: −{pct}%","Code {code} appliqué : −{pct}%","Gutschein {code} eingelöst: −{pct}%"],
+  "Ver saco":["View bag","Ver sacola","Ver bolsa","Voir le panier","Tasche ansehen"],
+  // checkout
+  "Checkout":["Checkout","Finalizar compra","Pago","Paiement","Kasse"],
+  "Só mais uns detalhes. Pagamento manual por MBWay ou Transferência Bancária — confirmamos a tua encomenda assim que o pagamento for recebido.":["Just a few more details. We confirm your order as soon as we receive the payment.","Só mais alguns detalhes. Confirmamos seu pedido assim que o pagamento for recebido.","Solo unos detalles más. Confirmamos tu pedido en cuanto recibimos el pago.","Encore quelques détails. Nous confirmons ta commande dès réception du paiement.","Nur noch ein paar Angaben. Wir bestätigen deine Bestellung, sobald die Zahlung eingegangen ist."],
+  "Nome completo":["Full name","Nome completo","Nombre completo","Nom complet","Vollständiger Name"],
+  "O teu nome":["Your name","Seu nome","Tu nombre","Ton nom","Dein Name"],
+  "Telemóvel":["Phone","Celular","Teléfono","Téléphone","Telefon"],
+  "tu@exemplo.com":["you@example.com","voce@exemplo.com","tu@ejemplo.com","toi@exemple.com","du@beispiel.de"],
+  "Morada de envio":["Shipping address","Endereço de entrega","Dirección de envío","Adresse de livraison","Lieferadresse"],
+  "Rua, nº, código postal, cidade":["Street, number, postcode, city","Rua, número, CEP, cidade","Calle, número, código postal, ciudad","Rue, numéro, code postal, ville","Straße, Nr., PLZ, Stadt"],
+  "MÉTODO DE PAGAMENTO":["PAYMENT METHOD","FORMA DE PAGAMENTO","MÉTODO DE PAGO","MOYEN DE PAIEMENT","ZAHLUNGSART"],
+  "Pagamento instantâneo pelo telemóvel":["Instant payment from your phone (Portugal)","Pagamento instantâneo pelo celular (Portugal)","Pago instantáneo desde el móvil (Portugal)","Paiement instantané depuis le mobile (Portugal)","Sofortzahlung per Handy (Portugal)"],
+  "Transferência bancária":["Bank transfer","Transferência bancária","Transferencia bancaria","Virement bancaire","Banküberweisung"],
+  "Cartão, Apple Pay ou Google Pay":["Card, Apple Pay or Google Pay","Cartão, Apple Pay ou Google Pay","Tarjeta, Apple Pay o Google Pay","Carte, Apple Pay ou Google Pay","Karte, Apple Pay oder Google Pay"],
+  "Pagamento seguro pelo Stripe":["Secure payment via Stripe","Pagamento seguro pelo Stripe","Pago seguro con Stripe","Paiement sécurisé via Stripe","Sichere Zahlung über Stripe"],
+  "Vais ser levado para a página segura do <b>Stripe</b> para pagar com cartão, <b>Apple Pay</b> ou <b>Google Pay</b>. Os dados do cartão nunca passam pela PLUSHER.":["You'll be taken to the secure <b>Stripe</b> page to pay by card, <b>Apple Pay</b> or <b>Google Pay</b>. Card details never pass through PLUSHER.","Você será levado à página segura do <b>Stripe</b> para pagar com cartão, <b>Apple Pay</b> ou <b>Google Pay</b>. Os dados do cartão nunca passam pela PLUSHER.","Irás a la página segura de <b>Stripe</b> para pagar con tarjeta, <b>Apple Pay</b> o <b>Google Pay</b>. Los datos de la tarjeta nunca pasan por PLUSHER.","Tu seras redirigé vers la page sécurisée de <b>Stripe</b> pour payer par carte, <b>Apple Pay</b> ou <b>Google Pay</b>. Les données de carte ne passent jamais par PLUSHER.","Du wirst zur sicheren <b>Stripe</b>-Seite weitergeleitet und zahlst mit Karte, <b>Apple Pay</b> oder <b>Google Pay</b>. Kartendaten laufen nie über PLUSHER."],
+  "Envia o valor total por MBWay para:":["Send the total via MBWay to:","Envie o valor total por MBWay para:","Envía el total por MBWay a:","Envoie le total par MBWay au :","Sende den Gesamtbetrag per MBWay an:"],
+  "Beneficiário:":["Beneficiary:","Favorecido:","Beneficiario:","Bénéficiaire :","Empfänger:"],
+  "COPIAR":["COPY","COPIAR","COPIAR","COPIER","KOPIEREN"],
+  "Copiado!":["Copied!","Copiado!","¡Copiado!","Copié !","Kopiert!"],
+  "Não foi possível copiar":["Couldn't copy","Não foi possível copiar","No se pudo copiar","Impossible de copier","Kopieren fehlgeschlagen"],
+  "Finalizar encomenda —":["Place order —","Finalizar pedido —","Finalizar pedido —","Valider la commande —","Bestellung abschließen —"],
+  "Preenche todos os campos":["Please fill in all fields","Preencha todos os campos","Completa todos los campos","Remplis tous les champs","Bitte alle Felder ausfüllen"],
+  "a abrir o pagamento…":["opening payment…","abrindo o pagamento…","abriendo el pago…","ouverture du paiement…","Zahlung wird geöffnet…"],
+  "Dúvidas:":["Questions:","Dúvidas:","Dudas:","Questions :","Fragen:"],
+  // confirmação
+  "Encomenda registada":["Order placed","Pedido registrado","Pedido registrado","Commande enregistrée","Bestellung aufgenommen"],
+  "Pagamento recebido":["Payment received","Pagamento recebido","Pago recibido","Paiement reçu","Zahlung erhalten"],
+  "Confirmar no WhatsApp":["Confirm on WhatsApp","Confirmar no WhatsApp","Confirmar por WhatsApp","Confirmer sur WhatsApp","Auf WhatsApp bestätigen"],
+  "Enviar encomenda por email":["Send order by email","Enviar pedido por e-mail","Enviar pedido por email","Envoyer la commande par e-mail","Bestellung per E-Mail senden"],
+  "Enviar comprovativo por email":["Send payment proof by email","Enviar comprovante por e-mail","Enviar comprobante por email","Envoyer la preuve de paiement","Zahlungsnachweis per E-Mail senden"],
+  "Falar connosco por email":["Email us","Fale conosco por e-mail","Escríbenos por email","Écris-nous par e-mail","Schreib uns eine E-Mail"],
+  "Fazer nova encomenda":["Place a new order","Fazer novo pedido","Hacer otro pedido","Nouvelle commande","Neue Bestellung"],
+  "Paga <b>{total}</b> por MBWay para <b>{mbway}</b>. Usa <b>{oid}</b> como descrição.":["Pay <b>{total}</b> via MBWay to <b>{mbway}</b>. Use <b>{oid}</b> as the reference.","Pague <b>{total}</b> por MBWay para <b>{mbway}</b>. Use <b>{oid}</b> como descrição.","Paga <b>{total}</b> por MBWay a <b>{mbway}</b>. Usa <b>{oid}</b> como concepto.","Paie <b>{total}</b> par MBWay au <b>{mbway}</b>. Utilise <b>{oid}</b> comme référence.","Zahle <b>{total}</b> per MBWay an <b>{mbway}</b>. Gib <b>{oid}</b> als Verwendungszweck an."],
+  "Paga <b>{total}</b> por transferência para o IBAN <b>{iban}</b> ({titular}). Usa <b>{oid}</b> como descrição.":["Pay <b>{total}</b> by bank transfer to IBAN <b>{iban}</b> ({titular}). Use <b>{oid}</b> as the reference.","Pague <b>{total}</b> por transferência para o IBAN <b>{iban}</b> ({titular}). Use <b>{oid}</b> como descrição.","Paga <b>{total}</b> por transferencia al IBAN <b>{iban}</b> ({titular}). Usa <b>{oid}</b> como concepto.","Paie <b>{total}</b> par virement sur l'IBAN <b>{iban}</b> ({titular}). Utilise <b>{oid}</b> comme référence.","Überweise <b>{total}</b> auf die IBAN <b>{iban}</b> ({titular}). Gib <b>{oid}</b> als Verwendungszweck an."],
+  "Confirma a encomenda no WhatsApp (botão abaixo) e envia o comprovativo do pagamento.":["Confirm your order on WhatsApp (button below) and send the payment proof.","Confirme o pedido no WhatsApp (botão abaixo) e envie o comprovante do pagamento.","Confirma el pedido por WhatsApp (botón de abajo) y envía el comprobante de pago.","Confirme ta commande sur WhatsApp (bouton ci-dessous) et envoie la preuve de paiement.","Bestätige die Bestellung auf WhatsApp (Button unten) und sende den Zahlungsnachweis."],
+  "Envia-nos a encomenda e o comprovativo de pagamento pelo WhatsApp ou por email (botões abaixo).":["Send us your order and payment proof via WhatsApp or email (buttons below).","Envie o pedido e o comprovante de pagamento pelo WhatsApp ou por e-mail (botões abaixo).","Envíanos el pedido y el comprobante de pago por WhatsApp o email (botones de abajo).","Envoie-nous ta commande et la preuve de paiement par WhatsApp ou e-mail (boutons ci-dessous).","Schick uns Bestellung und Zahlungsnachweis per WhatsApp oder E-Mail (Buttons unten)."],
+  "Confirmamos o pagamento e enviamos: {envio}":["We confirm the payment and ship: {envio}","Confirmamos o pagamento e enviamos: {envio}","Confirmamos el pago y enviamos: {envio}","Nous confirmons le paiement puis expédions : {envio}","Wir bestätigen die Zahlung und versenden: {envio}"],
+  "O teu pagamento foi processado pelo Stripe. Vais receber a confirmação por email.":["Your payment was processed by Stripe. You'll receive a confirmation by email.","Seu pagamento foi processado pelo Stripe. Você vai receber a confirmação por e-mail.","Tu pago fue procesado por Stripe. Recibirás la confirmación por email.","Ton paiement a été traité par Stripe. Tu recevras une confirmation par e-mail.","Deine Zahlung wurde von Stripe verarbeitet. Du erhältst eine Bestätigung per E-Mail."],
+  "Guarda o número da encomenda para qualquer dúvida.":["Keep your order number for any questions.","Guarde o número do pedido para qualquer dúvida.","Guarda el número de pedido por si tienes dudas.","Garde ton numéro de commande en cas de question.","Bewahre deine Bestellnummer für Rückfragen auf."],
+  "Enviamos a seguir: {envio}":["Next we ship: {envio}","Em seguida enviamos: {envio}","A continuación enviamos: {envio}","Ensuite nous expédions : {envio}","Danach versenden wir: {envio}"],
+  "Pagamento cancelado — o teu saco continua aqui":["Payment cancelled — your bag is still here","Pagamento cancelado — sua sacola continua aqui","Pago cancelado — tu bolsa sigue aquí","Paiement annulé — ton panier t'attend","Zahlung abgebrochen — deine Tasche ist noch da"],
+  // rodapé
+  "Streetwear premium feito em Portugal. Cada peça é desenhada para quem se move.":["Premium streetwear made in Portugal. Every piece is designed for people on the move.","Streetwear premium feito em Portugal. Cada peça é desenhada para quem está sempre em movimento.","Streetwear premium hecho en Portugal. Cada prenda está diseñada para quien se mueve.","Streetwear premium fabriqué au Portugal. Chaque pièce est pensée pour ceux qui bougent.","Premium-Streetwear aus Portugal. Jedes Teil ist für Menschen in Bewegung gemacht."],
+  "Recebe novidades e descontos exclusivos.":["Get news and exclusive discounts.","Receba novidades e descontos exclusivos.","Recibe novedades y descuentos exclusivos.","Reçois les nouveautés et des réductions exclusives.","Erhalte News und exklusive Rabatte."],
+  "Email para newsletter":["Newsletter email","E-mail para newsletter","Email para la newsletter","E-mail pour la newsletter","E-Mail für den Newsletter"],
+  "Subscrever":["Subscribe","Inscrever","Suscribirse","S'abonner","Abonnieren"],
+  "Obrigado! Já estás na lista.":["Thanks! You're on the list.","Obrigado! Você já está na lista.","¡Gracias! Ya estás en la lista.","Merci ! Tu es sur la liste.","Danke! Du bist auf der Liste."],
+  "PLUSHER. Todos os direitos reservados.":["PLUSHER. All rights reserved.","PLUSHER. Todos os direitos reservados.","PLUSHER. Todos los derechos reservados.","PLUSHER. Tous droits réservés.","PLUSHER. Alle Rechte vorbehalten."],
+  // WhatsApp e chat
+  "Falar connosco no WhatsApp":["Chat with us on WhatsApp","Fale conosco no WhatsApp","Escríbenos por WhatsApp","Écris-nous sur WhatsApp","Schreib uns auf WhatsApp"],
+  "Abrir o chat de ajuda":["Open help chat","Abrir o chat de ajuda","Abrir el chat de ayuda","Ouvrir le chat d'aide","Hilfe-Chat öffnen"],
+  "Chat de ajuda":["Help chat","Chat de ajuda","Chat de ayuda","Chat d'aide","Hilfe-Chat"],
+  "Ajuda PLUSHER":["PLUSHER Help","Ajuda PLUSHER","Ayuda PLUSHER","Aide PLUSHER","PLUSHER Hilfe"],
+  "Respostas na hora":["Instant answers","Respostas na hora","Respuestas al instante","Réponses immédiates","Sofort-Antworten"],
+  "Fechar o chat":["Close chat","Fechar o chat","Cerrar el chat","Fermer le chat","Chat schließen"],
+  "Escreve a tua pergunta…":["Type your question…","Digite sua pergunta…","Escribe tu pregunta…","Écris ta question…","Schreib deine Frage…"],
+  "Mensagem para o chat":["Chat message","Mensagem para o chat","Mensaje para el chat","Message pour le chat","Chat-Nachricht"],
+  "Enviar":["Send","Enviar","Enviar","Envoyer","Senden"],
+  "Assistente com IA · responde em vários idiomas":["AI assistant · answers in several languages","Assistente com IA · responde em vários idiomas","Asistente con IA · responde en varios idiomas","Assistant IA · répond en plusieurs langues","KI-Assistent · antwortet in mehreren Sprachen"],
+  "Olá PLUSHER! Tenho uma dúvida.":["Hi PLUSHER! I have a question.","Olá PLUSHER! Tenho uma dúvida.","¡Hola PLUSHER! Tengo una duda.","Salut PLUSHER ! J'ai une question.","Hallo PLUSHER! Ich habe eine Frage."],
+  "Olá PLUSHER! Quero confirmar a minha encomenda {oid}:":["Hi PLUSHER! I'd like to confirm my order {oid}:","Olá PLUSHER! Quero confirmar meu pedido {oid}:","¡Hola PLUSHER! Quiero confirmar mi pedido {oid}:","Salut PLUSHER ! Je veux confirmer ma commande {oid} :","Hallo PLUSHER! Ich möchte meine Bestellung {oid} bestätigen:"],
+  "Olá PLUSHER! Quero confirmar a minha encomenda {oid} (já paga pelo Stripe):":["Hi PLUSHER! I'd like to confirm my order {oid} (already paid via Stripe):","Olá PLUSHER! Quero confirmar meu pedido {oid} (já pago pelo Stripe):","¡Hola PLUSHER! Quiero confirmar mi pedido {oid} (ya pagado con Stripe):","Salut PLUSHER ! Je veux confirmer ma commande {oid} (déjà payée via Stripe) :","Hallo PLUSHER! Ich möchte meine Bestellung {oid} bestätigen (bereits über Stripe bezahlt):"],
+  "Olá PLUSHER! Paguei a encomenda {oid} pelo Stripe.":["Hi PLUSHER! I paid order {oid} via Stripe.","Olá PLUSHER! Paguei o pedido {oid} pelo Stripe.","¡Hola PLUSHER! Pagué el pedido {oid} con Stripe.","Salut PLUSHER ! J'ai payé la commande {oid} via Stripe.","Hallo PLUSHER! Ich habe die Bestellung {oid} über Stripe bezahlt."],
+  "Olá PLUSHER! Quero confirmar a encomenda {oid}.":["Hi PLUSHER! I'd like to confirm order {oid}.","Olá PLUSHER! Quero confirmar o pedido {oid}.","¡Hola PLUSHER! Quiero confirmar el pedido {oid}.","Salut PLUSHER ! Je veux confirmer la commande {oid}.","Hallo PLUSHER! Ich möchte die Bestellung {oid} bestätigen."],
+  "Olá PLUSHER! Quero confirmar a minha encomenda.":["Hi PLUSHER! I'd like to confirm my order.","Olá PLUSHER! Quero confirmar meu pedido.","¡Hola PLUSHER! Quiero confirmar mi pedido.","Salut PLUSHER ! Je veux confirmer ma commande.","Hallo PLUSHER! Ich möchte meine Bestellung bestätigen."],
+  "Olá PLUSHER! Preciso de ajuda com o tamanho.":["Hi PLUSHER! I need help with sizing.","Olá PLUSHER! Preciso de ajuda com o tamanho.","¡Hola PLUSHER! Necesito ayuda con la talla.","Salut PLUSHER ! J'ai besoin d'aide pour la taille.","Hallo PLUSHER! Ich brauche Hilfe bei der Größe."],
+  "Olá PLUSHER! Queria pedir uma troca/devolução.":["Hi PLUSHER! I'd like to request an exchange/return.","Olá PLUSHER! Queria pedir uma troca/devolução.","¡Hola PLUSHER! Quería pedir un cambio/devolución.","Salut PLUSHER ! Je voudrais demander un échange/retour.","Hallo PLUSHER! Ich möchte einen Umtausch/eine Rücksendung anfragen."],
+  "tamanho":["size","tamanho","talla","taille","Größe"],
+  "Pagamento":["Payment","Pagamento","Pago","Paiement","Zahlung"],
+  "Nome":["Name","Nome","Nombre","Nom","Name"],
+  "Cartão / Apple Pay / Google Pay":["Card / Apple Pay / Google Pay","Cartão / Apple Pay / Google Pay","Tarjeta / Apple Pay / Google Pay","Carte / Apple Pay / Google Pay","Karte / Apple Pay / Google Pay"],
+  // mensagens do servidor
+  "Um dos produtos já não está disponível":["One of the products is no longer available","Um dos produtos não está mais disponível","Uno de los productos ya no está disponible","Un des produits n'est plus disponible","Ein Produkt ist nicht mehr verfügbar"],
+  "Tamanho inválido em {x}":["Invalid size for {x}","Tamanho inválido em {x}","Talla no válida en {x}","Taille invalide pour {x}","Ungültige Größe bei {x}"],
+  "Demasiadas encomendas seguidas. Tenta mais tarde ou contacta-nos.":["Too many orders in a row. Please try later or contact us.","Muitos pedidos seguidos. Tente mais tarde ou fale conosco.","Demasiados pedidos seguidos. Inténtalo más tarde o contáctanos.","Trop de commandes à la suite. Réessaie plus tard ou contacte-nous.","Zu viele Bestellungen hintereinander. Bitte später erneut versuchen oder uns kontaktieren."],
+  "Demasiadas tentativas. Tenta mais tarde.":["Too many attempts. Try again later.","Muitas tentativas. Tente mais tarde.","Demasiados intentos. Inténtalo más tarde.","Trop de tentatives. Réessaie plus tard.","Zu viele Versuche. Bitte später erneut versuchen."],
+  "Não foi possível iniciar o pagamento. Tenta outro método ou contacta-nos.":["Couldn't start the payment. Try another method or contact us.","Não foi possível iniciar o pagamento. Tente outro método ou fale conosco.","No se pudo iniciar el pago. Prueba otro método o contáctanos.","Impossible de lancer le paiement. Essaie un autre moyen ou contacte-nous.","Zahlung konnte nicht gestartet werden. Versuche eine andere Methode oder kontaktiere uns."],
+  "Sem ligação ao servidor":["No connection to the server","Sem conexão com o servidor","Sin conexión con el servidor","Pas de connexion au serveur","Keine Verbindung zum Server"],
+  "Erro no servidor":["Server error","Erro no servidor","Error del servidor","Erreur serveur","Serverfehler"],
+  "Pedido recusado":["Request refused","Solicitação recusada","Solicitud rechazada","Requête refusée","Anfrage abgelehnt"],
+  // conteúdo da loja (textos iniciais; o que for editado no painel aparece como foi escrito)
+  "Streetwear premium feito em Portugal":["Premium streetwear made in Portugal","Streetwear premium feito em Portugal","Streetwear premium hecho en Portugal","Streetwear premium fabriqué au Portugal","Premium-Streetwear aus Portugal"],
+  "PLUSHER é uma marca de streetwear portuguesa nascida da cultura urbana. Cada peça é desenhada para quem se move, para quem não para. Always In Motion.":["PLUSHER is a Portuguese streetwear brand born from urban culture. Every piece is designed for those who move, for those who never stop. Always In Motion.","PLUSHER é uma marca de streetwear portuguesa nascida da cultura urbana. Cada peça é desenhada para quem se move, para quem não para. Always In Motion.","PLUSHER es una marca de streetwear portuguesa nacida de la cultura urbana. Cada prenda está diseñada para quien se mueve, para quien no para. Always In Motion.","PLUSHER est une marque de streetwear portugaise née de la culture urbaine. Chaque pièce est pensée pour ceux qui bougent, qui ne s'arrêtent jamais. Always In Motion.","PLUSHER ist eine portugiesische Streetwear-Marke aus der urbanen Kultur. Jedes Teil ist für alle gemacht, die sich bewegen und nie stillstehen. Always In Motion."],
+  "ENVIO GRÁTIS ACIMA DE 100€ // NOVA COLEÇÃO DISPONÍVEL":["FREE SHIPPING OVER €100 // NEW COLLECTION AVAILABLE","FRETE GRÁTIS ACIMA DE 100€ // NOVA COLEÇÃO DISPONÍVEL","ENVÍO GRATIS DESDE 100€ // NUEVA COLECCIÓN DISPONIBLE","LIVRAISON OFFERTE DÈS 100€ // NOUVELLE COLLECTION DISPONIBLE","KOSTENLOSER VERSAND AB 100€ // NEUE KOLLEKTION ERHÄLTLICH"],
+  "Envio grátis para encomendas acima de 100€. Entrega em 3-5 dias úteis em Portugal.":["Free shipping on orders over €100. Delivery in 3–5 business days in Portugal.","Frete grátis para pedidos acima de 100€. Entrega em 3 a 5 dias úteis em Portugal.","Envío gratis en pedidos de más de 100€. Entrega en 3-5 días hábiles en Portugal.","Livraison offerte dès 100€ de commande. Livraison en 3 à 5 jours ouvrés au Portugal.","Kostenloser Versand ab 100€. Lieferung in 3–5 Werktagen innerhalb Portugals."],
+  "O próximo lançamento da PLUSHER, com a linha Cartel 44. Peças limitadas — quando acabam, acabam.":["PLUSHER's next release, featuring the Cartel 44 line. Limited pieces — once they're gone, they're gone.","O próximo lançamento da PLUSHER, com a linha Cartel 44. Peças limitadas — quando acabam, acabou.","El próximo lanzamiento de PLUSHER, con la línea Cartel 44. Prendas limitadas: cuando se acaban, se acaban.","Le prochain lancement PLUSHER, avec la ligne Cartel 44. Pièces limitées — une fois parties, c'est fini.","Der nächste PLUSHER-Release mit der Linie Cartel 44. Limitierte Teile — weg ist weg."],
+  "Calças":["Pants","Calças","Pantalones","Pantalons","Hosen"],
+  "Acessórios":["Accessories","Acessórios","Accesorios","Accessoires","Accessoires"],
+  "PLUSHER Tee Step By Step — Preta":["PLUSHER Tee Step By Step — Black","PLUSHER Tee Step By Step — Preta","PLUSHER Tee Step By Step — Negra","PLUSHER Tee Step By Step — Noir","PLUSHER Tee Step By Step — Schwarz"],
+  "PLUSHER Tee Step By Step — Rosa":["PLUSHER Tee Step By Step — Pink","PLUSHER Tee Step By Step — Rosa","PLUSHER Tee Step By Step — Rosa","PLUSHER Tee Step By Step — Rose","PLUSHER Tee Step By Step — Rosa"],
+  "PLUSHER Tee No Days Off — Roxa":["PLUSHER Tee No Days Off — Purple","PLUSHER Tee No Days Off — Roxa","PLUSHER Tee No Days Off — Morada","PLUSHER Tee No Days Off — Violet","PLUSHER Tee No Days Off — Lila"],
+  "PLUSHER Cartel 44 Long Sleeve — Branca":["PLUSHER Cartel 44 Long Sleeve — White","PLUSHER Cartel 44 Long Sleeve — Branca","PLUSHER Cartel 44 Long Sleeve — Blanca","PLUSHER Cartel 44 Long Sleeve — Blanc","PLUSHER Cartel 44 Long Sleeve — Weiß"],
+  "PLUSHER Boné — Yellow Logo":["PLUSHER Cap — Yellow Logo","PLUSHER Boné — Yellow Logo","PLUSHER Gorra — Yellow Logo","PLUSHER Casquette — Yellow Logo","PLUSHER Cap — Yellow Logo"],
+  "BONÉ":["CAP","BONÉ","GORRA","CASQUETTE","CAP"],
+  "Hoodie oversize PLUSHER com estampa 'Always In Motion' nas costas. 100% algodão premium, corte largo, tecido pesado 450gsm. A peça icónica da coleção.":["Oversized PLUSHER hoodie with an 'Always In Motion' print on the back. 100% premium cotton, relaxed fit, heavyweight 450gsm fabric. The collection's iconic piece.","Hoodie oversized PLUSHER com estampa 'Always In Motion' nas costas. 100% algodão premium, corte largo, tecido pesado 450gsm. A peça icônica da coleção.","Hoodie oversize PLUSHER con estampado 'Always In Motion' en la espalda. 100% algodón premium, corte holgado, tejido grueso de 450gsm. La prenda icónica de la colección.","Hoodie oversize PLUSHER avec imprimé 'Always In Motion' au dos. 100% coton premium, coupe ample, tissu épais 450 g/m². La pièce iconique de la collection.","Oversize-Hoodie von PLUSHER mit 'Always In Motion'-Print auf dem Rücken. 100% Premium-Baumwolle, weiter Schnitt, schwerer 450-gsm-Stoff. Das ikonische Teil der Kollektion."],
+  "Hoodie oversize PLUSHER com logo frontal e detalhe 'Step By Step W PSLHR'. Tecido premium lavado, acabamento vintage. 450gsm.":["Oversized PLUSHER hoodie with front logo and 'Step By Step W PSLHR' detail. Washed premium fabric, vintage finish. 450gsm.","Hoodie oversized PLUSHER com logo frontal e detalhe 'Step By Step W PSLHR'. Tecido premium lavado, acabamento vintage. 450gsm.","Hoodie oversize PLUSHER con logo frontal y detalle 'Step By Step W PSLHR'. Tejido premium lavado, acabado vintage. 450gsm.","Hoodie oversize PLUSHER avec logo devant et détail 'Step By Step W PSLHR'. Tissu premium délavé, finition vintage. 450 g/m².","Oversize-Hoodie von PLUSHER mit Front-Logo und 'Step By Step W PSLHR'-Detail. Gewaschener Premium-Stoff, Vintage-Finish. 450 gsm."],
+  "T-shirt oversized PLUSHER da linha Step By Step, em preto. Estampa à frente e atrás.":["Oversized PLUSHER tee from the Step By Step line, in black. Print on the front and back.","Camiseta oversized PLUSHER da linha Step By Step, na cor preta. Estampa na frente e atrás.","Camiseta oversize PLUSHER de la línea Step By Step, en negro. Estampado delante y detrás.","T-shirt oversize PLUSHER de la ligne Step By Step, en noir. Imprimé devant et dos.","Oversize-T-Shirt von PLUSHER aus der Step-By-Step-Linie, in Schwarz. Print vorne und hinten."],
+  "T-shirt oversized PLUSHER da linha Step By Step, em rosa. Estampa à frente e atrás.":["Oversized PLUSHER tee from the Step By Step line, in pink. Print on the front and back.","Camiseta oversized PLUSHER da linha Step By Step, na cor rosa. Estampa na frente e atrás.","Camiseta oversize PLUSHER de la línea Step By Step, en rosa. Estampado delante y detrás.","T-shirt oversize PLUSHER de la ligne Step By Step, en rose. Imprimé devant et dos.","Oversize-T-Shirt von PLUSHER aus der Step-By-Step-Linie, in Rosa. Print vorne und hinten."],
+  "T-shirt PLUSHER 'No Days Off' em roxo. Para quem não tira dias de folga.":["PLUSHER 'No Days Off' tee in purple. For those who never take a day off.","Camiseta PLUSHER 'No Days Off' roxa. Para quem não tira folga.","Camiseta PLUSHER 'No Days Off' en morado. Para quien no se toma días libres.","T-shirt PLUSHER 'No Days Off' violet. Pour ceux qui ne prennent jamais de pause.","PLUSHER 'No Days Off'-T-Shirt in Lila. Für alle, die sich keinen freien Tag gönnen."],
+  "Long sleeve PLUSHER da linha Cartel 44, em branco.":["PLUSHER long sleeve from the Cartel 44 line, in white.","Manga longa PLUSHER da linha Cartel 44, na cor branca.","Manga larga PLUSHER de la línea Cartel 44, en blanco.","Manches longues PLUSHER de la ligne Cartel 44, en blanc.","PLUSHER-Longsleeve aus der Linie Cartel 44, in Weiß."],
+  "Calças cargo PLUSHER em preto lavado. Corte largo com bolsos laterais. Tecido resistente com detalhes da marca.":["PLUSHER cargo pants in washed black. Relaxed fit with side pockets. Durable fabric with brand details.","Calça cargo PLUSHER em preto lavado. Corte largo com bolsos laterais. Tecido resistente com detalhes da marca.","Pantalones cargo PLUSHER en negro lavado. Corte holgado con bolsillos laterales. Tejido resistente con detalles de la marca.","Pantalon cargo PLUSHER noir délavé. Coupe ample avec poches latérales. Tissu résistant avec détails de la marque.","PLUSHER-Cargohose in gewaschenem Schwarz. Weiter Schnitt mit Seitentaschen. Robuster Stoff mit Marken-Details."],
+  "Boné PLUSHER com logo bordado em amarelo. Aba curva, ajuste traseiro com fivela metálica.":["PLUSHER cap with yellow embroidered logo. Curved brim, back strap with metal buckle.","Boné PLUSHER com logo bordado em amarelo. Aba curva, ajuste traseiro com fivela metálica.","Gorra PLUSHER con logo bordado en amarillo. Visera curva, ajuste trasero con hebilla metálica.","Casquette PLUSHER avec logo brodé jaune. Visière courbée, réglage arrière à boucle métallique.","PLUSHER-Cap mit gelb gesticktem Logo. Gebogener Schirm, hinterer Verschluss mit Metallschnalle."],
+  "Algodão premium":["Premium cotton","Algodão premium","Algodón premium","Coton premium","Premium-Baumwolle"],
+  "Tecido pesado":["Heavyweight fabric","Tecido pesado","Tejido grueso","Tissu épais","Schwerer Stoff"],
+  "Corte oversize largo":["Relaxed oversized fit","Corte oversized largo","Corte oversize holgado","Coupe oversize ample","Weiter Oversize-Schnitt"],
+  "Faces estampadas":["Printed sides","Lados estampados","Caras estampadas","Faces imprimées","Bedruckte Seiten"],
+  "Tecido premium":["Premium fabric","Tecido premium","Tejido premium","Tissu premium","Premium-Stoff"],
+  "Acabamento vintage":["Vintage finish","Acabamento vintage","Acabado vintage","Finition vintage","Vintage-Finish"],
+  "Logo PLUSHER":["PLUSHER logo","Logo PLUSHER","Logo PLUSHER","Logo PLUSHER","PLUSHER-Logo"],
+  "Detalhe Step By Step":["Step By Step detail","Detalhe Step By Step","Detalle Step By Step","Détail Step By Step","Step-By-Step-Detail"],
+  "Lavado":["Washed","Lavado","Lavado","Délavé","Gewaschen"],
+  "Frente":["Front","Frente","Frente","Devant","Vorne"],
+};
+const T = {};
+LANG_ORDER.forEach((l, i) => { T[l] = {}; for (const k in TR) T[l][k] = TR[k][i]; });
+
+// t('texto português', {vars}) → texto no idioma escolhido
+function t(src, vars){
+  let s = (T[LANG] && T[LANG][src]) || src;
+  if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] ?? m));
+  return s;
+}
+// mensagens de erro vindas do servidor (em português)
+function tErr(msg){
+  const m = String(msg || '').match(/^Tamanho inválido em (.+)$/);
+  return m ? t('Tamanho inválido em {x}', { x: t(m[1]) }) : t(msg);
+}
+
+// tradução automática da página: textos, placeholders e etiquetas de acessibilidade
+const I18N_SKIP = 'script,style,noscript,#adm,#chatB,.hero-title,[data-noi18n]';
+function translateNode(node){
+  if (node.nodeType === 3){
+    const raw = node.nodeValue, key = raw.trim();
+    const tr = key && T[LANG][key];
+    if (!tr || tr === key) return; // igual ao original: não mexe (evita ciclos do observador)
+    const p = node.parentElement;
+    if (p && p.closest(I18N_SKIP)) return;
+    node.nodeValue = raw.replace(key, tr);
+    return;
+  }
+  if (node.nodeType !== 1 || node.closest(I18N_SKIP)) return;
+  for (const a of ['placeholder','aria-label','alt','title']){
+    const v = node.getAttribute(a);
+    if (v && T[LANG][v.trim()] && T[LANG][v.trim()] !== v.trim()) node.setAttribute(a, T[LANG][v.trim()]);
+  }
+  const w = document.createTreeWalker(node, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+    acceptNode: n => (n.nodeType === 1 && n.matches(I18N_SKIP)) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
+  });
+  let n = w.nextNode();
+  while (n){
+    if (n.nodeType === 3) translateNode(n);
+    else for (const a of ['placeholder','aria-label','alt','title']){
+      const v = n.getAttribute(a);
+      if (v && T[LANG][v.trim()] && T[LANG][v.trim()] !== v.trim()) n.setAttribute(a, T[LANG][v.trim()]);
+    }
+    n = w.nextNode();
+  }
+}
+function startI18n(){
+  translateNode(document.body);
+  new MutationObserver(list => {
+    for (const m of list){
+      if (m.type === 'characterData') translateNode(m.target);
+      else m.addedNodes.forEach(translateNode);
+    }
+  }).observe(document.body, { childList:true, subtree:true, characterData:true });
+}
+
+/* ecrã de escolha de idioma: aparece na primeira visita e pelo botão de idioma no menu */
+function openLangGate(){
+  const g = document.getElementById('langGate');
+  g.hidden = false; requestAnimationFrame(() => g.classList.add('on'));
+  document.documentElement.style.overflow = 'hidden';
+  setTimeout(() => g.querySelector(`[data-lang="${LANG}"]`)?.focus(), 80);
+}
+function chooseLang(l){
+  try { localStorage.setItem('plusher_lang', l); } catch {}
+  if (l !== LANG){ location.reload(); return; }
+  const g = document.getElementById('langGate');
+  g.classList.remove('on'); document.documentElement.style.overflow = '';
+  setTimeout(() => { g.hidden = true; }, 500);
+}
+(() => {
+  const list = document.getElementById('lgList');
+  list.innerHTML = LANG_ORDER.map(l => `<button type="button" data-lang="${l}" lang="${l}" class="${l === LANG ? 'cur' : ''}"><b>${LANGS[l][0]}</b><span>${LANGS[l][1]}</span></button>`).join('');
+  list.addEventListener('click', e => { const b = e.target.closest('[data-lang]'); if (b) chooseLang(b.dataset.lang); });
+  document.getElementById('langBtn').textContent = LANGS[LANG][0];
+  document.getElementById('langBtn').addEventListener('click', openLangGate);
+  document.getElementById('langGate').addEventListener('keydown', e => { if (e.key === 'Escape' && LANG_SAVED) chooseLang(LANG); });
+  if (!LANG_SAVED) openLangGate();
+})();
+
+const DEC = (1.5).toLocaleString(LOCALE).charAt(1);
+
 /* ===================== UTIL ===================== */
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
-const fmt = v => v.toFixed(2).replace('.', ',') + ' €';
+const money = new Intl.NumberFormat(LOCALE, { style:'currency', currency:'EUR' });
+const fmt = v => money.format(v);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clamp = (v, a=0, b=1) => Math.min(b, Math.max(a, v));
 const store = {
@@ -935,9 +1276,9 @@ function art(p){
   const dark = ['#1A1A1A','#7B4FD8'].includes(p.cor);
   const fg = dark ? '#FAFF00' : '#000';
   return `<div class="ph-art" style="background:${p.cor};color:${fg}">
-    <span class="s">PLUSHER / ${esc(p.categoria.toUpperCase())}</span>
+    <span class="s">PLUSHER / ${esc(t(p.categoria).toUpperCase())}</span>
     <svg class="shirt" viewBox="0 0 100 100" fill="none" stroke="${fg}" stroke-width="2.2"><path d="M34 14 L18 22 L8 42 L22 48 L26 40 L26 88 L74 88 L74 40 L78 48 L92 42 L82 22 L66 14 Q50 26 34 14Z"/><text x="50" y="62" text-anchor="middle" font-family="Unbounded" font-size="7" font-weight="900" fill="${fg}" stroke="none">PLUSHER</text></svg>
-    <span class="t">${esc(p.arte || p.nome)}</span></div>`;
+    <span class="t">${esc(t(p.arte || p.nome))}</span></div>`;
 }
 function thumb(p, i=0, extra=''){
   p.imagens = p.imagens || [];
@@ -945,21 +1286,22 @@ function thumb(p, i=0, extra=''){
 }
 
 /* ===================== TEXTOS ===================== */
-$('#announce').innerHTML = Array(6).fill(`<span>${esc(CONFIG.anuncio)}</span>`).join('');
+$('#announce').innerHTML = Array(6).fill(`<span>${esc(t(CONFIG.anuncio))}</span>`).join('');
 $('#marq').innerHTML = Array(4).fill(CONFIG.marquee.map(t => `<span>${esc(t)}</span>`).join('')).join('');
-$('#heroSub').textContent = CONFIG.subtitulo + '. ' + 'Cada peça é desenhada para quem se move, para quem não para.';
+$('#heroSub').textContent = t(CONFIG.subtitulo) + '. ' + t('Cada peça é desenhada para quem se move, para quem não para.');
 $('#heroCardImg').src = IMG.preta;
 $('#zImg').src = CONFIG.heroImg;
-$('#zCapTxt').textContent = CONFIG.subtitulo + '. Hoodies 450gsm, t-shirts oversize e drops limitados.';
+$('#zCapTxt').textContent = t(CONFIG.subtitulo) + '. ' + t('Hoodies 450gsm, t-shirts oversize e drops limitados.');
 $('#maniImg').src = CONFIG.marcaImg;
-$('#words').innerHTML = CONFIG.sobre.split(' ').map(w => `<span>${esc(w)} </span>`).join('');
+$('#words').innerHTML = t(CONFIG.sobre).split(' ').map(w => `<span>${esc(w)} </span>`).join('');
 $('#yr').textContent = new Date().getFullYear();
 $('#fIg').href = CONFIG.instagram;
 $('#fMail').href = 'mailto:' + CONFIG.email;
 $('#fMail').textContent = CONFIG.email;
-$('#footCats').innerHTML = CONFIG.categorias.map(c => `<a href="#catalogo" data-goto-cat="${esc(c.nome)}">${esc(c.nome)}${c.ativa?'':' · em breve'}</a>`).join('');
-$('#mShip').textContent = CONFIG.envioInfo;
-$('#shipNote').textContent = CONFIG.envioInfo + ' Dúvidas: ' + CONFIG.email;
+$('#footCats').innerHTML = CONFIG.categorias.map(c => `<a href="#catalogo" data-goto-cat="${esc(c.nome)}">${esc(t(c.nome))}${c.ativa?'':' · '+t('em breve')}</a>`).join('');
+$('#mShip').textContent = t(CONFIG.envioInfo);
+$('#catTitle').innerHTML = t('O <em>catá</em>logo');
+$('#shipNote').textContent = t(CONFIG.envioInfo) + ' ' + t('Dúvidas:') + ' ' + CONFIG.email;
 if (matchMedia('(max-width:820px)').matches) $('[data-only-m]').style.display = '';
 
 /* ===================== HERO: chuva ===================== */
@@ -1003,7 +1345,7 @@ if (matchMedia('(max-width:820px)').matches) $('[data-only-m]').style.display = 
     const el = $('#'+id);
     el.addEventListener('input', () => { S[k] = el.value/100; $('#'+out).textContent = el.value+'%'; if(k==='int') sync(); });
   });
-  $('#labToggle').addEventListener('click', e => { paused = !paused; e.currentTarget.textContent = paused ? '▶' : '❚❚'; e.currentTarget.setAttribute('aria-label', paused?'Retomar animação':'Pausar animação'); if(!paused) loop(); });
+  $('#labToggle').addEventListener('click', e => { paused = !paused; e.currentTarget.textContent = paused ? '▶' : '❚❚'; e.currentTarget.setAttribute('aria-label', t(paused?'Retomar animação':'Pausar animação')); if(!paused) loop(); });
   new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible && !paused) loop(); }).observe(hero);
 
   function splash(d){
@@ -1064,7 +1406,7 @@ $('#showcases').innerHTML = destaques.map((p, i) => {
       <p class="desc">${esc(p.descricao)}</p>
       <p class="specs-t">ESPECIFICAÇÕES</p>
       <ul class="specs">${(p.specs||[]).map(([v,l]) => `<li><b>${esc(v)}</b><span>${esc(l)}</span></li>`).join('')}</ul>
-      <div class="price"><sup>€</sup>${Math.floor(p.preco)}<sup>,${(p.preco%1).toFixed(2).slice(2)}</sup></div>
+      <div class="price"><sup>€</sup>${Math.floor(p.preco)}<sup>${DEC}${(p.preco%1).toFixed(2).slice(2)}</sup></div>
       <div class="sizes">${p.tamanhos.map((t,j) => `<button class="size${j===1?' sel':''}" data-size="${esc(t)}">${esc(t)}</button>`).join('')}</div>
       <button class="btn btn-dark" data-add-show="${p.id}">Adicionar ao saco <span class="ar">↗</span></button>
     </div>
@@ -1072,7 +1414,7 @@ $('#showcases').innerHTML = destaques.map((p, i) => {
       <div class="hero-img"><img src="${p.imagens[0]}" alt="${esc(p.nome)}" loading="lazy"></div>
       <div class="stack"><div class="big">${esc(big.slice(0,half).join(' '))}<br>${esc(big.slice(half).join(' '))}<br><span style="font-size:.45em;letter-spacing:-.03em">${String(i+1).padStart(2,'0')} / hoodie</span></div></div>
     </div>
-    <div class="gal">${gal.map((src,j) => `<figure data-fig><img src="${src}" alt="" loading="lazy"><figcaption>${String(j+1).padStart(2,'0')} — ${j<p.imagens.length?'VISTA':'COLEÇÃO'}</figcaption></figure>`).join('')}</div>
+    <div class="gal">${gal.map((src,j) => `<figure data-fig><img src="${src}" alt="" loading="lazy"><figcaption>${String(j+1).padStart(2,'0')} — ${t(j<p.imagens.length?'VISTA':'COLEÇÃO')}</figcaption></figure>`).join('')}</div>
   </section>`;
 }).join('');
 $$('.show').forEach(sec => {
@@ -1108,7 +1450,7 @@ function renderTrack(){
       <div class="meta"><div><h4>${esc(p.nome)}</h4><p>${esc(p.categoria)}</p></div><span class="pr">${p.emBreve ? 'Em breve' : fmt(p.preco)}</span></div>
     </article>`).join('') + `
     <div class="card end"><p class="eyebrow">Fim da coleção</p><h3>Não para.<br>Continua.</h3><a class="btn btn-acc" href="#drop">Próximo drop <span class="ar">↗</span></a></div>`;
-  $('#catCount').textContent = `${list.filter(p=>!p.emBreve).length} DISPONÍVEIS · ${list.filter(p=>p.emBreve).length} EM BREVE`;
+  $('#catCount').textContent = t('{a} DISPONÍVEIS · {b} EM BREVE', { a: list.filter(p=>!p.emBreve).length, b: list.filter(p=>p.emBreve).length });
   sizeCatalog();
 }
 $('#chips').addEventListener('click', e => {
@@ -1140,8 +1482,8 @@ $('#cats').innerHTML = CONFIG.categorias.map((c,i) => `
 $('#cats').addEventListener('click', e => { const a = e.target.closest('[data-goto-cat]'); if(!a) return; e.preventDefault(); filtro = a.dataset.gotoCat; renderChips(); renderTrack(); scrollToEl($('#catalogo')); });
 
 /* ===================== DROP ===================== */
-$('#dropName').textContent = CONFIG.drop.nome;
-$('#dropDesc').textContent = CONFIG.drop.descricao;
+$('#dropName').textContent = t(CONFIG.drop.nome);
+$('#dropDesc').textContent = t(CONFIG.drop.descricao);
 $('#dropPics').innerHTML = CONFIG.drop.imagens.slice(0,2).map(s => `<div data-r><img src="${s}" alt="" loading="lazy"></div>`).join('');
 $('#dropBtn').href = `mailto:${CONFIG.email}?subject=${encodeURIComponent('Avisa-me: ' + CONFIG.drop.nome)}&body=${encodeURIComponent('Olá PLUSHER! Quero ser avisado(a) quando o ' + CONFIG.drop.nome + ' sair.')}`;
 (function tick(){
@@ -1163,7 +1505,7 @@ $('#dropBtn').href = `mailto:${CONFIG.email}?subject=${encodeURIComponent('Avisa
 let mProd = null, mSize = null;
 function openModal(id){
   const p = byId(id); if (!p) return; mProd = p; mSize = null;
-  $('#mCat').textContent = p.categoria + (p.emBreve ? ' · Em breve' : '');
+  $('#mCat').textContent = t(p.categoria) + (p.emBreve ? ' · ' + t('Em breve') : '');
   $('#mName').textContent = p.nome;
   $('#mPr').textContent = fmt(p.preco);
   $('#mDesc').textContent = p.descricao;
@@ -1178,7 +1520,7 @@ function openModal(id){
       <button class="btn btn-acc" id="mAdd" style="width:100%;margin-top:22px">Adicionar ao saco <span class="ar">+</span></button>`;
     if (p.tamanhos.length === 1){ mSize = p.tamanhos[0]; $('#mSizes .size').classList.add('sel'); }
     $('#mSizes').onclick = e => { const b = e.target.closest('[data-s]'); if(!b) return; mSize = b.dataset.s; $$('#mSizes .size').forEach(x => x.classList.toggle('sel', x===b)); };
-    $('#mAdd').onclick = () => { if (!mSize){ toast('Seleciona um tamanho', false); return; } addToBag(p.id, mSize); closeModal(); };
+    $('#mAdd').onclick = () => { if (!mSize){ toast(t('Seleciona um tamanho'), false); return; } addToBag(p.id, mSize); closeModal(); };
   }
   $('#modal').classList.add('on'); $('#modal').setAttribute('aria-hidden','false');
   lenis?.stop(); document.body.style.overflow = 'hidden';
@@ -1196,7 +1538,7 @@ function addToBag(id, size){
   size = size || p.tamanhos[0];
   const it = bag.find(b => b.id===id && b.size===size);
   if (it) it.qty++; else bag.push({ id, size, qty:1 });
-  saveBag(); toast(`${p.nome} (${size}) adicionado`);
+  saveBag(); toast(t('{nome} ({size}) adicionado', { nome: t(p.nome), size }));
   const n = $('#navCount'); n.animate([{transform:'scale(1.6)'},{transform:'scale(1)'}],{duration:400,easing:'cubic-bezier(.16,1,.3,1)'});
 }
 function saveBag(){ store.set('plusher_bag', bag); renderBag(); }
@@ -1210,21 +1552,21 @@ function renderBag(){
   const n = bag.reduce((s,b) => s+b.qty, 0);
   $('#navCount').textContent = n;
   $('#bagN').textContent = String(n).padStart(2,'0');
-  $('#bagSub').textContent = n ? `Tens ${n} ${n===1?'peça pronta':'peças prontas'} para o próximo passo.` : 'O teu saco está vazio.';
+  $('#bagSub').textContent = n ? t(n===1 ? 'Tens {n} peça pronta para o próximo passo.' : 'Tens {n} peças prontas para o próximo passo.', { n }) : t('O teu saco está vazio.');
   $('#rows').innerHTML = bag.length ? bag.map((b,i) => { const p = byId(b.id); return `
     <div class="row">
-      <div class="it"><div class="th">${thumb(p,0)}</div><div><h5>${esc(p.nome)}</h5><p class="v">${esc(p.categoria)} / Tamanho ${esc(b.size)}</p><p class="u">${fmt(p.preco)}</p></div></div>
+      <div class="it"><div class="th">${thumb(p,0)}</div><div><h5>${esc(p.nome)}</h5><p class="v">${esc(t(p.categoria))} / ${esc(t('Tamanho'))} ${esc(b.size)}</p><p class="u">${fmt(p.preco)}</p></div></div>
       <div class="qty"><button data-q="${i}" data-d="-1" aria-label="Menos">−</button><span>${b.qty}</span><button data-q="${i}" data-d="1" aria-label="Mais">+</button></div>
       <div class="tot">${fmt(p.preco*b.qty)}</div>
       <button class="rm" data-rm="${i}" aria-label="Remover">✕</button>
     </div>`; }).join('') : `<div class="empty"><b>Ainda nada aqui</b>Escolhe as tuas peças no <a href="#catalogo" style="border-bottom:1.5px solid #000">catálogo</a>.</div>`;
-  const t = totals();
-  $('#tSub').textContent = fmt(t.sub);
+  const tot = totals();
+  $('#tSub').textContent = fmt(tot.sub);
   $('#tDiscRow').style.display = discount ? '' : 'none';
-  $('#tDisc').textContent = '−' + fmt(t.disc) + ` (${discount}%)`;
-  $('#tShip').textContent = !n ? '—' : (t.freeShip ? 'Grátis' : 'A calcular');
-  $('#tTot').textContent = fmt(t.tot);
-  $('#goTot').textContent = fmt(t.tot);
+  $('#tDisc').textContent = '−' + fmt(tot.disc) + ` (${discount}%)`;
+  $('#tShip').textContent = !n ? '—' : (tot.freeShip ? 'Grátis' : 'A calcular');
+  $('#tTot').textContent = fmt(tot.tot);
+  $('#goTot').textContent = fmt(tot.tot);
 }
 $('#rows').addEventListener('click', e => {
   const q = e.target.closest('[data-q]'), r = e.target.closest('[data-rm]');
@@ -1237,13 +1579,13 @@ $('#couponForm').addEventListener('submit', e => {
   if (API){
     // os códigos só existem no servidor
     api('/api/cupao', { method:'POST', json:{ code:c } })
-      .then(r => { discount = r.pct; couponCode = r.code; toast(`Cupão ${r.code} aplicado: −${r.pct}%`); })
-      .catch(err => { discount = 0; couponCode = ''; toast(err.message, false); })
+      .then(r => { discount = r.pct; couponCode = r.code; toast(t('Cupão {code} aplicado: −{pct}%', { code: r.code, pct: r.pct })); })
+      .catch(err => { discount = 0; couponCode = ''; toast(tErr(err.message), false); })
       .finally(renderBag);
     return;
   }
-  if (CONFIG.cupoes[c]){ discount = CONFIG.cupoes[c]; couponCode = c; toast(`Cupão ${c} aplicado: −${discount}%`); }
-  else { discount = 0; couponCode = ''; toast('Cupão inválido', false); }
+  if (CONFIG.cupoes[c]){ discount = CONFIG.cupoes[c]; couponCode = c; toast(t('Cupão {code} aplicado: −{pct}%', { code: c, pct: discount })); }
+  else { discount = 0; couponCode = ''; toast(t('Cupão inválido'), false); }
   renderBag();
 });
 
@@ -1251,6 +1593,7 @@ $('#couponForm').addEventListener('submit', e => {
 const copyBtn = v => `<button type="button" data-copy="${esc(v)}">COPIAR</button>`;
 $('#pi-mbway').innerHTML = `Envia o valor total por MBWay para:<br><span class="mono">${esc(CONFIG.mbway)}</span>${copyBtn(CONFIG.mbway)}`;
 $('#pi-transferencia').innerHTML = `IBAN: <span class="mono">${esc(CONFIG.iban)}</span>${copyBtn(CONFIG.iban.replace(/\s/g,''))}<br>Beneficiário: <b>${esc(CONFIG.titular)}</b>`;
+$('#pi-stripe').innerHTML = t($('#pi-stripe').innerHTML.trim());
 // cartão / Apple Pay / Google Pay: só aparece quando o servidor tem o Stripe configurado
 if (API && CONFIG.pagamentos?.stripe){
   const os = $('#optStripe'); os.hidden = false;
@@ -1265,20 +1608,20 @@ $$('.opt').forEach(o => o.addEventListener('click', () => {
 }));
 document.addEventListener('click', e => {
   const c = e.target.closest('[data-copy]'); if (!c) return;
-  navigator.clipboard?.writeText(c.dataset.copy).then(() => toast('Copiado!'), () => toast('Não foi possível copiar', false));
+  navigator.clipboard?.writeText(c.dataset.copy).then(() => toast(t('Copiado!')), () => toast(t('Não foi possível copiar'), false));
 });
 
 /* Finalizar: com servidor, a encomenda é registada e os preços são recalculados lá;
    sem servidor, gera só o resumo para enviar por email. */
 $('#ckForm').addEventListener('submit', async e => {
   e.preventDefault();
-  if (!bag.length){ toast('O teu saco está vazio', false); scrollToEl($('#catalogo')); return; }
+  if (!bag.length){ toast(t('O teu saco está vazio'), false); scrollToEl($('#catalogo')); return; }
   const f = { nome:$('#fNome'), tel:$('#fTel'), email:$('#fEmail'), morada:$('#fMorada') };
   let ok = true;
   Object.values(f).forEach(i => { const bad = !i.value.trim() || (i.type==='email' && !/^\S+@\S+\.\S+$/.test(i.value)); i.classList.toggle('bad', bad); if (bad) ok = false; });
-  if (!ok){ toast('Preenche todos os campos', false); return; }
-  const t = totals();
-  let oid, total = t.tot, sub = t.sub, disc = t.disc, freeShip = t.freeShip, online = false;
+  if (!ok){ toast(t('Preenche todos os campos'), false); return; }
+  const tot = totals();
+  let oid, total = tot.tot, sub = tot.sub, disc = tot.disc, freeShip = tot.freeShip, online = false;
   if (API){
     const btn = $('#goBtn'); btn.disabled = true;
     try {
@@ -1290,11 +1633,11 @@ $('#ckForm').addEventListener('submit', async e => {
       // Stripe: segue para a página de pagamento; o saco só é esvaziado quando volta com sucesso
       if (r.checkoutUrl && /^https:\/\/checkout\.stripe\.com\//.test(r.checkoutUrl)){
         try { sessionStorage.setItem('plusher_last_order', JSON.stringify(orderSummary(oid, total, disc, 'stripe', f.nome.value))); } catch {}
-        btn.querySelector('span').textContent = 'a abrir o pagamento…';
+        btn.querySelector('span').textContent = t('a abrir o pagamento…');
         location.href = r.checkoutUrl;
         return;
       }
-    } catch (err) { toast(err.message, false); btn.disabled = false; return; }
+    } catch (err) { toast(tErr(err.message), false); btn.disabled = false; return; }
     btn.disabled = false;
   } else {
     oid = 'PLS-' + Date.now().toString(36).toUpperCase().slice(-6);
@@ -1305,9 +1648,9 @@ $('#ckForm').addEventListener('submit', async e => {
   $('#oid').textContent = oid;
   $('#waBtn').href = waLink(orderWaText(orderSummary(oid, total, disc, pay, f.nome.value)));
   $('#doneSteps').innerHTML = `
-    <li>Paga <b>${fmt(total)}</b> por ${pay==='mbway' ? `MBWay para <b>${esc(CONFIG.mbway)}</b>` : `transferência para o IBAN <b>${esc(CONFIG.iban)}</b> (${esc(CONFIG.titular)})`}. Usa <b>${oid}</b> como descrição.</li>
-    <li>${online ? 'Confirma a encomenda no WhatsApp (botão abaixo) e envia o comprovativo do pagamento.' : 'Envia-nos a encomenda e o comprovativo de pagamento pelo WhatsApp ou por email (botões abaixo).'}</li>
-    <li>Confirmamos o pagamento e enviamos: ${esc(CONFIG.envioInfo)}</li>`;
+    <li>${pay==='mbway' ? t('Paga <b>{total}</b> por MBWay para <b>{mbway}</b>. Usa <b>{oid}</b> como descrição.', { total: fmt(total), mbway: esc(CONFIG.mbway), oid }) : t('Paga <b>{total}</b> por transferência para o IBAN <b>{iban}</b> ({titular}). Usa <b>{oid}</b> como descrição.', { total: fmt(total), iban: esc(CONFIG.iban), titular: esc(CONFIG.titular), oid })}</li>
+    <li>${t(online ? 'Confirma a encomenda no WhatsApp (botão abaixo) e envia o comprovativo do pagamento.' : 'Envia-nos a encomenda e o comprovativo de pagamento pelo WhatsApp ou por email (botões abaixo).')}</li>
+    <li>${t('Confirmamos o pagamento e enviamos: {envio}', { envio: esc(t(CONFIG.envioInfo)) })}</li>`;
   $('#mailBtn').href = `mailto:${CONFIG.email}?subject=${encodeURIComponent((online ? 'Comprovativo — encomenda ' : 'Encomenda ') + oid)}&body=${encodeURIComponent(corpo)}`;
   $('#mailBtn').firstChild.textContent = online ? 'Enviar comprovativo por email ' : 'Enviar encomenda por email ';
   $('#ckForm').style.display = 'none'; $('#done').classList.add('on');
@@ -1324,15 +1667,15 @@ $('#newOrder').addEventListener('click', () => { $('#done').classList.remove('on
     bag = []; discount = 0; couponCode = ''; saveBag();
     $('#oid').textContent = pago;
     let last = null; try { last = JSON.parse(sessionStorage.getItem('plusher_last_order') || 'null'); } catch {}
-    $('#waBtn').href = waLink(last && last.oid === pago ? orderWaText(last, true) : `Olá PLUSHER! Paguei a encomenda ${pago} pelo Stripe.`);
+    $('#waBtn').href = waLink(last && last.oid === pago ? orderWaText(last, true) : t('Olá PLUSHER! Paguei a encomenda {oid} pelo Stripe.', { oid: pago }));
     $('#done h3').textContent = 'Pagamento recebido';
-    $('#doneSteps').innerHTML = `<li>O teu pagamento foi processado pelo Stripe. Vais receber a confirmação por email.</li>
-      <li>Guarda o número da encomenda para qualquer dúvida.</li><li>Enviamos a seguir: ${esc(CONFIG.envioInfo)}</li>`;
+    $('#doneSteps').innerHTML = `<li>${t('O teu pagamento foi processado pelo Stripe. Vais receber a confirmação por email.')}</li>
+      <li>${t('Guarda o número da encomenda para qualquer dúvida.')}</li><li>${t('Enviamos a seguir: {envio}', { envio: esc(t(CONFIG.envioInfo)) })}</li>`;
     $('#mailBtn').href = `mailto:${CONFIG.email}?subject=${encodeURIComponent('Encomenda ' + pago)}`;
     $('#mailBtn').firstChild.textContent = 'Falar connosco por email ';
     $('#ckForm').style.display = 'none'; $('#done').classList.add('on');
   } else if (valid(cancel)) {
-    setTimeout(() => toast('Pagamento cancelado — o teu saco continua aqui', false), 600);
+    setTimeout(() => toast(t('Pagamento cancelado — o teu saco continua aqui'), false), 600);
   }
   if (valid(pago) || valid(cancel)) history.replaceState(null, '', location.pathname + '#saco');
 })();
@@ -1341,7 +1684,7 @@ $('#newOrder').addEventListener('click', () => { $('#done').classList.remove('on
 $('#nlForm').addEventListener('submit', e => {
   e.preventDefault(); const v = e.target.querySelector('input').value.trim(); if (!v) return;
   location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent('Newsletter PLUSHER')}&body=${encodeURIComponent('Quero receber novidades: ' + v)}`;
-  toast('Obrigado! Já estás na lista.'); e.target.reset();
+  toast(t('Obrigado! Já estás na lista.')); e.target.reset();
 });
 
 /* ===================== TOAST ===================== */
@@ -1350,6 +1693,8 @@ function toast(msg, withLink=true){
   $('#toastTxt').textContent = msg; $('#toast a').style.display = withLink ? '' : 'none';
   $('#toast').classList.add('on'); clearTimeout(tt); tt = setTimeout(() => $('#toast').classList.remove('on'), 2600);
 }
+
+startI18n();
 
 /* ===================== ANIMAÇÕES DE SCROLL ===================== */
 // split de títulos em letras
@@ -1424,28 +1769,91 @@ addEventListener('resize', () => { sizeCatalog(); onScroll(); });
 /* ===================== WHATSAPP ===================== */
 const waNumber = () => String(CONFIG.whatsapp || '+351 926795705').replace(/\D/g, '');
 const waLink = text => `https://wa.me/${waNumber()}?text=${encodeURIComponent(text)}`;
-const payName = p => p === 'stripe' ? 'Cartão / Apple Pay / Google Pay' : p === 'transferencia' ? 'Transferência bancária' : 'MBWay';
+const payName = p => p === 'stripe' ? t('Cartão / Apple Pay / Google Pay') : p === 'transferencia' ? t('Transferência bancária') : 'MBWay';
 // resumo da encomenda (tirado do saco antes de ser esvaziado)
 function orderSummary(oid, total, desconto, pagamento, nome){
   return { oid, total, desconto, pagamento, nome, itens: bag.map(b => { const p = byId(b.id); return { nome:p.nome, size:b.size, qty:b.qty, total:p.preco*b.qty }; }) };
 }
 function orderWaText(o, pago = false){
-  const linhas = o.itens.map(i => `• ${i.qty}× ${i.nome} — tamanho ${i.size} — ${fmt(i.total)}`).join('\n');
-  return `Olá PLUSHER! Quero confirmar a minha encomenda ${o.oid}${pago ? " (já paga pelo Stripe)" : ""}:\n\n${linhas}\n\n${o.desconto ? `Desconto: −${fmt(o.desconto)}\n` : ""}Total: ${fmt(o.total)}\nPagamento: ${payName(o.pagamento)}\nNome: ${o.nome}`;
+  const linhas = o.itens.map(i => `• ${i.qty}× ${t(i.nome)} — ${t('tamanho')} ${i.size} — ${fmt(i.total)}`).join('\n');
+  const head = t(pago ? 'Olá PLUSHER! Quero confirmar a minha encomenda {oid} (já paga pelo Stripe):' : 'Olá PLUSHER! Quero confirmar a minha encomenda {oid}:', { oid: o.oid });
+  return `${head}\n\n${linhas}\n\n${o.desconto ? `${t('Desconto')}: −${fmt(o.desconto)}\n` : ''}${t('Total')}: ${fmt(o.total)}\n${t('Pagamento')}: ${payName(o.pagamento)}\n${t('Nome')}: ${o.nome}`;
 }
-$('#waFab').href = waLink('Olá PLUSHER! Tenho uma dúvida.');
+$('#waFab').href = waLink(t('Olá PLUSHER! Tenho uma dúvida.'));
 
 /* ===================== CHAT DE AJUDA ===================== */
-/* Responde com os dados reais da loja. Com ANTHROPIC_API_KEY no servidor usa IA (Claude);
+/* Responde com os dados reais da loja, no idioma escolhido. Com ANTHROPIC_API_KEY no servidor usa IA (Claude);
    sem chave (ou se a IA falhar) usa as respostas locais abaixo. */
 (() => {
   const box = $('#chat'), body = $('#chatB'), input = $('#chatIn'), fab = $('#chatFab');
   const AI = API && CONFIG.chatIA;
   const hist = [];
   let started = false, busy = false;
-  const norm = t => String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  const has = (t, words) => words.some(w => t.includes(w));
-  const waAct = (label = 'Falar no WhatsApp', text = 'Olá PLUSHER! Tenho uma dúvida.') => ({ label, href: waLink(text), cls: 'w' });
+  const L = LANG_ORDER.indexOf(LANG);
+  // textos do chat: [en, pt-BR, es, fr, de]
+  const C = {
+    hello:["Hi! I'm the PLUSHER assistant. Ask me about pieces, sizes, shipping, payment or orders.","Olá! Sou o assistente da PLUSHER. Pergunte sobre peças, tamanhos, frete, pagamento ou pedidos.","¡Hola! Soy el asistente de PLUSHER. Pregúntame por prendas, tallas, envío, pago o pedidos.","Salut ! Je suis l'assistant PLUSHER. Pose-moi tes questions sur les pièces, tailles, livraison, paiement ou commandes.","Hallo! Ich bin der PLUSHER-Assistent. Frag mich zu Teilen, Größen, Versand, Zahlung oder Bestellungen."],
+    hi:["Hi! How can I help? Ask me about pieces, sizes, shipping, payment or the next drop.","Olá! Como posso ajudar? Pergunte sobre peças, tamanhos, frete, pagamento ou o próximo drop.","¡Hola! ¿En qué te ayudo? Pregúntame por prendas, tallas, envío, pago o el próximo drop.","Salut ! Comment je peux t'aider ? Demande-moi pour les pièces, tailles, livraison, paiement ou le prochain drop.","Hallo! Wie kann ich helfen? Frag mich zu Teilen, Größen, Versand, Zahlung oder dem nächsten Drop."],
+    orderOid:["To confirm or check order {oid}, message us on WhatsApp — we'll look it up right away.","Para confirmar ou saber o status do pedido {oid}, fale conosco no WhatsApp: vemos seu pedido na hora.","Para confirmar o consultar el pedido {oid}, escríbenos por WhatsApp y lo revisamos al momento.","Pour confirmer ou suivre la commande {oid}, écris-nous sur WhatsApp : on la vérifie tout de suite.","Um die Bestellung {oid} zu bestätigen oder zu prüfen, schreib uns auf WhatsApp — wir schauen sofort nach."],
+    order:["After checking out in the bag you get an order number (PLS-…). To confirm it or check its status, send us that number on WhatsApp.","Ao finalizar na sacola você recebe um número de pedido (PLS-…). Para confirmar ou saber o status, envie esse número no WhatsApp.","Al finalizar en la bolsa recibes un número de pedido (PLS-…). Para confirmarlo o consultar su estado, envíanos ese número por WhatsApp.","En validant ton panier tu reçois un numéro de commande (PLS-…). Pour la confirmer ou la suivre, envoie-nous ce numéro sur WhatsApp.","Nach dem Abschluss in der Tasche erhältst du eine Bestellnummer (PLS-…). Schick sie uns auf WhatsApp, um die Bestellung zu bestätigen oder den Status zu erfahren."],
+    confirmBtn:["Confirm on WhatsApp","Confirmar no WhatsApp","Confirmar por WhatsApp","Confirmer sur WhatsApp","Auf WhatsApp bestätigen"],
+    price:["Price","Preço","Precio","Prix","Preis"],
+    sizesW:["Sizes","Tamanhos","Tallas","Tailles","Größen"],
+    soonLine:["Coming soon — not on sale yet.","Em breve — ainda não está à venda.","Próximamente — aún no está a la venta.","Bientôt — pas encore en vente.","Demnächst — noch nicht im Verkauf."],
+    seePiece:["View piece","Ver peça","Ver prenda","Voir la pièce","Teil ansehen"],
+    sizesHead:["Available sizes:","Tamanhos disponíveis:","Tallas disponibles:","Tailles disponibles :","Verfügbare Größen:"],
+    sizesNote:["Hoodies have an oversized (loose) fit. If you're between two sizes, tell us your height on WhatsApp and we'll help.","As hoodies têm corte oversized (largo). Se estiver em dúvida entre dois tamanhos, diga sua altura no WhatsApp e ajudamos.","Las hoodies tienen corte oversize (holgado). Si dudas entre dos tallas, dinos tu altura por WhatsApp y te ayudamos.","Les hoodies ont une coupe oversize (ample). Si tu hésites entre deux tailles, donne-nous ta taille en cm sur WhatsApp et on t'aide.","Die Hoodies sind oversize (weit) geschnitten. Wenn du zwischen zwei Größen schwankst, nenn uns deine Körpergröße auf WhatsApp und wir helfen."],
+    sizeBtn:["Help with size","Ajuda com o tamanho","Ayuda con la talla","Aide pour la taille","Hilfe bei der Größe"],
+    payHead:["You can pay with:","Você pode pagar com:","Puedes pagar con:","Tu peux payer par :","Du kannst bezahlen mit:"],
+    payStripe:["Card, Apple Pay or Google Pay (secure Stripe page)","Cartão, Apple Pay ou Google Pay (página segura do Stripe)","Tarjeta, Apple Pay o Google Pay (página segura de Stripe)","Carte, Apple Pay ou Google Pay (page sécurisée Stripe)","Karte, Apple Pay oder Google Pay (sichere Stripe-Seite)"],
+    payNote:["You choose the method at the end of checkout, in the bag.","Você escolhe a forma de pagamento no fim do checkout, na sacola.","Eliges el método al final del pago, en la bolsa.","Tu choisis le moyen de paiement à la fin, dans le panier.","Die Zahlungsart wählst du am Ende des Checkouts in der Tasche."],
+    dropOn:["{nome}: launches on {date} (in {n} {d}).","{nome}: lança em {date} (daqui a {n} {d}).","{nome}: sale el {date} (en {n} {d}).","{nome} : sortie le {date} (dans {n} {d}).","{nome}: erscheint am {date} (in {n} {d})."],
+    dropOut:["{nome}: it's out!","{nome}: já saiu!","{nome}: ¡ya salió!","{nome} : c'est sorti !","{nome}: ist da!"],
+    dropTba:["{nome}: date to be announced.","{nome}: data a anunciar.","{nome}: fecha por anunciar.","{nome} : date à venir.","{nome}: Termin folgt."],
+    day:["day","dia","día","jour","Tag"], days:["days","dias","días","jours","Tagen"],
+    dropBtn:["See the drop","Ver o drop","Ver el drop","Voir le drop","Zum Drop"],
+    hoodies:["Hoodies:","Hoodies:","Hoodies:","Hoodies :","Hoodies:"],
+    tees:["T-shirts:","Camisetas:","Camisetas:","T-shirts :","T-Shirts:"],
+    forSale:["On sale now:","À venda agora:","A la venta ahora:","En vente maintenant :","Jetzt erhältlich:"],
+    soonHead:["Coming soon:","Em breve:","Próximamente:","Bientôt :","Demnächst:"],
+    soonPrice:["coming soon","em breve","próximamente","bientôt","demnächst"],
+    openCat:["Open the catalog","Abrir o catálogo","Abrir el catálogo","Ouvrir le catalogue","Katalog öffnen"],
+    coupon:["If you have a discount code, type it in the \"Coupon\" field of the bag before checking out. The discount shows up in the total right away.","Se você tem um código de desconto, digite no campo \"Cupom\" da sacola antes de finalizar. O desconto aparece na hora no total.","Si tienes un código de descuento, escríbelo en el campo \"Cupón\" de la bolsa antes de finalizar. El descuento aparece al momento en el total.","Si tu as un code promo, saisis-le dans le champ « Code promo » du panier avant de valider. La réduction s'affiche tout de suite.","Wenn du einen Gutscheincode hast, gib ihn vor dem Abschluss im Feld „Gutschein“ der Tasche ein. Der Rabatt erscheint sofort im Gesamtbetrag."],
+    returns:["For exchanges and returns, talk to us directly — we handle each case with you.","Para trocas e devoluções, fale conosco diretamente: resolvemos cada caso com você.","Para cambios y devoluciones, escríbenos directamente: gestionamos cada caso contigo.","Pour les échanges et retours, écris-nous directement : on gère chaque cas avec toi.","Für Umtausch und Rücksendungen schreib uns direkt — wir klären jeden Fall mit dir."],
+    returnsBtn:["Request on WhatsApp","Pedir no WhatsApp","Pedir por WhatsApp","Demander sur WhatsApp","Auf WhatsApp anfragen"],
+    contact:["You can reach us by:","Você pode falar conosco por:","Puedes contactarnos por:","Tu peux nous contacter par :","Du erreichst uns über:"],
+    waBtn:["Chat on WhatsApp","Falar no WhatsApp","Hablar por WhatsApp","Écrire sur WhatsApp","Auf WhatsApp schreiben"],
+    thanks:["You're welcome! Always in motion. 🖤","De nada! Always in motion. 🖤","¡De nada! Always in motion. 🖤","Avec plaisir ! Always in motion. 🖤","Gern geschehen! Always in motion. 🖤"],
+    fallback:["I'm not sure about that one. Try one of the topics below, or message us on WhatsApp and we'll reply directly.","Não tenho certeza da resposta. Tente um dos temas abaixo, ou fale conosco no WhatsApp e respondemos diretamente.","No estoy seguro de la respuesta. Prueba uno de los temas de abajo o escríbenos por WhatsApp y te respondemos directamente.","Je ne suis pas sûr de la réponse. Essaie un des thèmes ci-dessous, ou écris-nous sur WhatsApp et on te répond directement.","Da bin ich mir nicht sicher. Probier eines der Themen unten oder schreib uns auf WhatsApp — wir antworten direkt."],
+  };
+  const c = (k, v) => { let s = (C[k] || [])[L] ?? C[k]?.[0] ?? k; if (v) s = s.replace(/\{(\w+)\}/g, (m, x) => (v[x] ?? m)); return s; };
+  const CHIPS = [
+    [["Sizes","Tamanhos","Tallas","Tailles","Größen"], ["What sizes do you have?","Quais tamanhos vocês têm?","¿Qué tallas tienen?","Quelles tailles avez-vous ?","Welche Größen gibt es?"]],
+    [["Shipping","Frete","Envío","Livraison","Versand"], ["How does shipping work?","Como funciona o frete?","¿Cómo funciona el envío?","Comment fonctionne la livraison ?","Wie funktioniert der Versand?"]],
+    [["Payment","Pagamento","Pago","Paiement","Zahlung"], ["Which payment methods do you accept?","Quais formas de pagamento vocês aceitam?","¿Qué métodos de pago aceptan?","Quels moyens de paiement acceptez-vous ?","Welche Zahlungsarten akzeptiert ihr?"]],
+    [["Products","Produtos","Productos","Produits","Produkte"], ["What pieces do you have for sale?","Quais peças estão à venda?","¿Qué prendas tienen a la venta?","Quelles pièces sont en vente ?","Welche Teile gibt es zu kaufen?"]],
+    [["Next drop","Próximo drop","Próximo drop","Prochain drop","Nächster Drop"], ["When is the next drop?","Quando é o próximo drop?","¿Cuándo es el próximo drop?","C'est quand le prochain drop ?","Wann ist der nächste Drop?"]],
+    [["My order","Meu pedido","Mi pedido","Ma commande","Meine Bestellung"], ["I want to confirm my order","Quero confirmar meu pedido","Quiero confirmar mi pedido","Je veux confirmer ma commande","Ich möchte meine Bestellung bestätigen"]],
+    [["Returns","Trocas","Cambios","Retours","Umtausch"], ["How do I make an exchange?","Como faço uma troca?","¿Cómo hago un cambio?","Comment faire un échange ?","Wie funktioniert ein Umtausch?"]],
+  ];
+  // palavras-chave em todas as línguas (sem acentos)
+  const K = {
+    order:['encomenda','pedido','rastrear','minha compra','confirmar','order','track','commande','suivi','bestellung','sendungsverfolgung','bestatigen'],
+    size:['tamanho','medida','size','talla','taille','grosse','groß','gross','grose','masse','maße','mesure','caber','serve','oversize','largo','fit','xl','xxl'],
+    ship:['envio','entrega','portes','prazo','frete','correio','ctt','shipping','deliver','delivery','livraison','expedition','versand','lieferung','envoi'],
+    pay:['pagamento','pagar','mbway','mb way','iban','transferencia','cartao','apple','google','stripe','visa','mastercard','payment','pay','card','pago','tarjeta','paiement','carte','virement','zahlung','bezahlen','karte','uberweisung'],
+    drop:['drop','lancamento','cartel','novidade','nova colecao','quando sai','launch','release','lanzamiento','lancement','sortie','erscheint'],
+    hoodie:['hoodie','sweat','camisola','casaco','capuz','moletom','sudadera','capuche','kapuze'],
+    tee:['t-shirt','tshirt','t shirt','camiseta','camisa','tee','manga','shirt'],
+    prod:['produto','catalogo','preco','quanto custa','quanto e','roupa','pecas','comprar','loja','price','product','buy','shop','precio','producto','prenda','tienda','prix','produit','acheter','boutique','preis','produkt','kaufen','teile'],
+    coupon:['cupao','cupom','desconto','codigo','promo','voucher','coupon','discount','cupon','descuento','reduction','code','gutschein','rabatt'],
+    returns:['troca','trocar','devol','reembolso','defeito','return','exchange','refund','cambio','devolucion','echange','retour','rembourse','umtausch','rucksendung','zuruck'],
+    contact:['contacto','contato','email','instagram','whatsapp','telefone','falar','humano','pessoa','ajuda','contact','human','help','talk','contactar','ayuda','persona','aide','parler','kontakt','hilfe','mensch'],
+    thanks:['obrigad','thank','valeu','gracias','merci','danke'],
+  };
+  const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const has = (s, words) => words.some(w => s.includes(w));
+  const waAct = (label, text) => ({ label: label || c('waBtn'), href: waLink(text || t('Olá PLUSHER! Tenho uma dúvida.')), cls: 'w' });
   const venda = () => PRODUTOS.filter(p => !p.emBreve);
 
   function add(role, text, actions = []){
@@ -1470,62 +1878,56 @@ $('#waFab').href = waLink('Olá PLUSHER! Tenho uma dúvida.');
   }
 
   // ---------- respostas locais ----------
-  const prodLine = p => `• ${p.nome} — ${p.emBreve ? "em breve" : fmt(p.preco)}`;
-  const verPeca = p => ({ label:'Ver peça', do:() => { close(); openModal(p.id); } });
-  function findProduct(t){
+  const prodLine = p => `• ${t(p.nome)} — ${p.emBreve ? c('soonPrice') : fmt(p.preco)}`;
+  const verPeca = p => ({ label: c('seePiece'), do: () => { close(); openModal(p.id); } });
+  function findProduct(s){
     const stop = ['plusher','hoodie','tee','long','sleeve','pants','step','by'];
     let best = null, score = 0;
     for (const p of PRODUTOS){
-      const keys = norm(p.nome).split(/[^a-z0-9]+/).filter(k => k.length >= 3 && !stop.includes(k));
-      const sc = keys.filter(k => t.includes(k)).length;
+      const keys = [...new Set((norm(p.nome) + ' ' + norm(t(p.nome))).split(/[^a-z0-9]+/))].filter(k => k.length >= 3 && !stop.includes(k));
+      const sc = keys.filter(k => s.includes(k)).length;
       if (sc > score){ best = p; score = sc; }
     }
     return best;
   }
   function local(raw){
-    const t = norm(raw);
+    const s = norm(raw);
     const oid = (raw.toUpperCase().match(/PLS-[A-Z0-9]{6}/) || [])[0];
-    if (oid || has(t, ['encomenda','pedido','rastrear','estado da','minha compra','confirmar','order']))
-      return { text: oid ? `Para confirmar ou saber o estado da encomenda ${oid}, fala connosco no WhatsApp: vemos logo o teu pedido.`
-                        : 'Depois de finalizar no saco recebes um número de encomenda (PLS-…). Para a confirmar ou saber o estado, envia-nos esse número no WhatsApp.',
-               actions: [waAct('Confirmar no WhatsApp', oid ? `Olá PLUSHER! Quero confirmar a encomenda ${oid}.` : 'Olá PLUSHER! Quero confirmar a minha encomenda.')] };
-    const p = findProduct(t);
-    if (p) return { text: `${p.nome}\n${p.emBreve ? "Em breve — ainda não está à venda." : `Preço: ${fmt(p.preco)}`}\nTamanhos: ${p.tamanhos.join(", ")}${p.descricao ? `\n\n${p.descricao}` : ""}`, actions: p.emBreve ? [] : [verPeca(p)] };
-    if (has(t, ['tamanho','medida','size','caber','serve','oversize','largo','xl','xxl']))
-      return { text: 'Tamanhos disponíveis:\n' + venda().map(p => `• ${p.nome}: ${p.tamanhos.join(", ")}`).join('\n') + '\n\nAs hoodies têm corte oversize (largo). Se tiveres dúvidas entre dois tamanhos, diz-nos a tua altura no WhatsApp e ajudamos.',
-               actions: [waAct('Ajuda com o tamanho', 'Olá PLUSHER! Preciso de ajuda com o tamanho.')] };
-    if (has(t, ['envio','entrega','portes','prazo','chega','shipping','deliver','correio','ctt']))
-      return { text: CONFIG.envioInfo };
-    if (has(t, ['pagamento','pagar','mbway','mb way','iban','transferencia','cartao','apple','google','stripe','visa','mastercard','payment']))
-      return { text: 'Podes pagar com:\n' + [`• MBWay — ${CONFIG.mbway}`, `• Transferência bancária — IBAN ${CONFIG.iban} (${CONFIG.titular})`, ...(CONFIG.pagamentos?.stripe ? ['• Cartão, Apple Pay ou Google Pay (página segura do Stripe)'] : [])].join('\n') + '\n\nEscolhes o método no fim do checkout, no saco.' };
-    if (has(t, ['drop','lancamento','cartel','novidade','nova colecao','quando sai']) && CONFIG.drop?.nome){
-      const d = new Date(CONFIG.drop.data), left = Math.ceil((d - new Date()) / 864e5);
-      return { text: `${CONFIG.drop.nome}: ${isNaN(d) ? "data a anunciar" : left > 0 ? `lança a ${d.toLocaleDateString("pt-PT", { day:"numeric", month:"long" })} (daqui a ${left} ${left === 1 ? "dia" : "dias"})` : "já saiu!"}.\n${CONFIG.drop.descricao || ""}`,
-               actions: [{ label:'Ver o drop', do:() => { close(); scrollToEl($('#drop')); } }] };
+    if (oid || has(s, K.order))
+      return { text: oid ? c('orderOid', { oid }) : c('order'),
+               actions: [waAct(c('confirmBtn'), oid ? t('Olá PLUSHER! Quero confirmar a encomenda {oid}.', { oid }) : t('Olá PLUSHER! Quero confirmar a minha encomenda.'))] };
+    const p = findProduct(s);
+    if (p) return { text: `${t(p.nome)}\n${p.emBreve ? c('soonLine') : `${c('price')}: ${fmt(p.preco)}`}\n${c('sizesW')}: ${p.tamanhos.join(', ')}${p.descricao ? `\n\n${t(p.descricao)}` : ''}`, actions: p.emBreve ? [] : [verPeca(p)] };
+    if (has(s, K.size))
+      return { text: c('sizesHead') + '\n' + venda().map(p => `• ${t(p.nome)}: ${p.tamanhos.join(', ')}`).join('\n') + '\n\n' + c('sizesNote'),
+               actions: [waAct(c('sizeBtn'), t('Olá PLUSHER! Preciso de ajuda com o tamanho.'))] };
+    if (has(s, K.ship)) return { text: t(CONFIG.envioInfo) };
+    if (has(s, K.pay))
+      return { text: c('payHead') + '\n' + [`• MBWay — ${CONFIG.mbway}`, `• ${t('Transferência bancária')} — IBAN ${CONFIG.iban} (${CONFIG.titular})`, ...(CONFIG.pagamentos?.stripe ? ['• ' + c('payStripe')] : [])].join('\n') + '\n\n' + c('payNote') };
+    if (has(s, K.drop) && CONFIG.drop?.nome){
+      const d = new Date(CONFIG.drop.data), left = Math.ceil((d - new Date()) / 864e5), nome = t(CONFIG.drop.nome);
+      const line = isNaN(d) ? c('dropTba', { nome }) : left > 0 ? c('dropOn', { nome, date: d.toLocaleDateString(LOCALE, { day:'numeric', month:'long' }), n: left, d: c(left === 1 ? 'day' : 'days') }) : c('dropOut', { nome });
+      return { text: line + (CONFIG.drop.descricao ? '\n' + t(CONFIG.drop.descricao) : ''), actions: [{ label: c('dropBtn'), do: () => { close(); scrollToEl($('#drop')); } }] };
     }
-    if (has(t, ['hoodie','sweat','camisola','casaco','capuz'])){
+    if (has(s, K.hoodie)){
       const l = PRODUTOS.filter(x => x.categoria === 'Hoodies');
-      return { text: 'Hoodies:\n' + l.map(prodLine).join('\n'), actions: l.filter(x => !x.emBreve).slice(0,3).map(verPeca) };
+      return { text: c('hoodies') + '\n' + l.map(prodLine).join('\n'), actions: l.filter(x => !x.emBreve).slice(0, 3).map(verPeca) };
     }
-    if (has(t, ['t-shirt','tshirt','t shirt','camiseta','camisa','tee','manga'])){
+    if (has(s, K.tee)){
       const l = PRODUTOS.filter(x => x.categoria === 'T-Shirts');
-      return { text: 'T-shirts:\n' + l.map(prodLine).join('\n'), actions: l.filter(x => !x.emBreve).slice(0,3).map(verPeca) };
+      return { text: c('tees') + '\n' + l.map(prodLine).join('\n'), actions: l.filter(x => !x.emBreve).slice(0, 3).map(verPeca) };
     }
-    if (has(t, ['produto','catalogo','preco','quanto custa','quanto e','roupa','pecas','comprar','loja','price']))
-      return { text: 'À venda agora:\n' + venda().map(prodLine).join('\n') + (PRODUTOS.some(x => x.emBreve) ? '\n\nEm breve: ' + PRODUTOS.filter(x => x.emBreve).map(x => x.nome).join(', ') : ''),
-               actions: [{ label:'Abrir o catálogo', do:() => { close(); scrollToEl($('#catalogo')); } }] };
-    if (has(t, ['cupao','cupom','desconto','codigo','promo','voucher']))
-      return { text: 'Se tens um código de desconto, escreve-o no campo "Cupão" do saco antes de finalizar. O desconto aparece logo no total.' };
-    if (has(t, ['troca','trocar','devol','reembolso','defeito','return']))
-      return { text: 'Para trocas e devoluções fala connosco diretamente: tratamos de cada caso contigo.', actions: [waAct('Pedir troca no WhatsApp', 'Olá PLUSHER! Queria pedir uma troca/devolução.')] };
-    if (has(t, ['contacto','contato','email','instagram','whatsapp','telefone','falar','humano','pessoa','ajuda']))
-      return { text: `Podes falar connosco por:\n• WhatsApp ${CONFIG.whatsapp || "+351 926795705"}\n• Email ${CONFIG.email}\n• Instagram`,
+    if (has(s, K.prod))
+      return { text: c('forSale') + '\n' + venda().map(prodLine).join('\n') + (PRODUTOS.some(x => x.emBreve) ? '\n\n' + c('soonHead') + ' ' + PRODUTOS.filter(x => x.emBreve).map(x => t(x.nome)).join(', ') : ''),
+               actions: [{ label: c('openCat'), do: () => { close(); scrollToEl($('#catalogo')); } }] };
+    if (has(s, K.coupon)) return { text: c('coupon') };
+    if (has(s, K.returns)) return { text: c('returns'), actions: [waAct(c('returnsBtn'), t('Olá PLUSHER! Queria pedir uma troca/devolução.'))] };
+    if (has(s, K.contact))
+      return { text: `${c('contact')}\n• WhatsApp ${CONFIG.whatsapp || '+351 926795705'}\n• Email ${CONFIG.email}\n• Instagram`,
                actions: [waAct(), { label:'Instagram', href: CONFIG.instagram }, { label:'Email', href:'mailto:' + CONFIG.email }] };
-    if (has(t, ['obrigad','thank','valeu','top']))
-      return { text: 'De nada! Always in motion. 🖤' };
-    if (/^(ola|oi|bom dia|boa tarde|boa noite|hey|hello|hi|e ai)\b/.test(t))
-      return { text: 'Olá! Em que posso ajudar? Pergunta-me sobre peças, tamanhos, envio, pagamentos ou o próximo drop.' };
-    return { text: 'Não tenho a certeza da resposta. Experimenta um dos temas abaixo, ou fala connosco no WhatsApp e respondemos-te diretamente.', actions: [waAct()] };
+    if (has(s, K.thanks)) return { text: c('thanks') };
+    if (/^(ola|oi|bom dia|boa tarde|boa noite|hey|hello|hi|e ai|hola|buenas|salut|bonjour|coucou|hallo|guten tag|servus)\b/.test(s)) return { text: c('hi') };
+    return { text: c('fallback'), actions: [waAct()] };
   }
 
   // ---------- envio ----------
@@ -1538,10 +1940,9 @@ $('#waFab').href = waLink('Olá PLUSHER! Tenho uma dúvida.');
       busy = true; $('#chatF button').disabled = true;
       const typing = document.createElement('div'); typing.className = 'msg bot typing'; typing.textContent = '•••'; body.appendChild(typing); body.scrollTop = body.scrollHeight;
       try {
-        const r = await api('/api/chat', { method:'POST', json:{ messages: hist } });
+        const r = await api('/api/chat', { method:'POST', json:{ messages: hist, lang: LANG } });
         typing.remove();
-        const pedeWa = /whatsapp/i.test(r.text);
-        add('assistant', r.text, pedeWa ? [waAct()] : []);
+        add('assistant', r.text, /whatsapp/i.test(r.text) ? [waAct()] : []);
       } catch {
         typing.remove();
         const a = local(text); add('assistant', a.text, a.actions);
@@ -1555,10 +1956,7 @@ $('#waFab').href = waLink('Olá PLUSHER! Tenho uma dúvida.');
   function open(){
     box.classList.add('on'); box.setAttribute('aria-hidden', 'false'); fab.setAttribute('aria-expanded', 'true');
     $('#chatDot').style.display = 'none';
-    if (!started){
-      started = true;
-      add('assistant', 'Olá! Sou o assistente da PLUSHER. Pergunta-me sobre peças, tamanhos, envio, pagamentos ou encomendas.');
-    }
+    if (!started){ started = true; add('assistant', c('hello')); }
     setTimeout(() => input.focus(), 200);
   }
   function close(){ box.classList.remove('on'); box.setAttribute('aria-hidden', 'true'); fab.setAttribute('aria-expanded', 'false'); }
@@ -1567,10 +1965,9 @@ $('#waFab').href = waLink('Olá PLUSHER! Tenho uma dúvida.');
   addEventListener('keydown', e => { if (e.key === 'Escape' && box.classList.contains('on')) close(); });
   $('#chatF').addEventListener('submit', e => { e.preventDefault(); ask(input.value); });
 
-  const CHIPS = [['Tamanhos','Que tamanhos têm?'], ['Envio','Como funciona o envio?'], ['Pagamento','Que métodos de pagamento aceitam?'], ['Produtos','Que peças têm à venda?'], ['Próximo drop','Quando é o próximo drop?'], ['A minha encomenda','Quero confirmar a minha encomenda'], ['Trocas','Como faço uma troca?']];
-  $('#chatChips').innerHTML = CHIPS.map(([l, q]) => `<button type="button" data-q="${esc(q)}">${esc(l)}</button>`).join('');
+  $('#chatChips').innerHTML = CHIPS.map(([l, q]) => `<button type="button" data-q="${esc(q[L])}">${esc(l[L])}</button>`).join('');
   $('#chatChips').addEventListener('click', e => { const b = e.target.closest('[data-q]'); if (b) ask(b.dataset.q); });
-  if (AI) $('#chatSub').textContent = 'Assistente com IA · responde em vários idiomas';
+  if (AI) $('#chatSub').textContent = t('Assistente com IA · responde em vários idiomas');
 })();
 
 /* ===================== ÁREA DO GERENTE ===================== */
@@ -1938,7 +2335,7 @@ function resize(){
 resize();
 addEventListener('resize', () => { resize(); need = true; });
 
-loadTxt.textContent = 'A CARREGAR 3D…';
+loadTxt.textContent = t('A CARREGAR 3D…');
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 loader.load(MODEL_URL, gltf => {
   const m = gltf.scene;
@@ -1954,7 +2351,7 @@ loader.load(MODEL_URL, gltf => {
   document.body.classList.add('has3d');
   need = true;
 }, xhr => {
-  if (xhr.total) loadTxt.textContent = `A CARREGAR 3D… ${Math.round(xhr.loaded / xhr.total * 100)}%`;
+  if (xhr.total) loadTxt.textContent = `${t('A CARREGAR 3D…')} ${Math.round(xhr.loaded / xhr.total * 100)}%`;
 }, () => { loadTxt.textContent = ''; canvas.remove(); });
 
 /* ---------- percurso comandado pelo scroll ---------- */
