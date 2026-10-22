@@ -31,6 +31,12 @@ Para criar ou mudar o login do gerente: `npm run acesso`, depois reinicia o serv
 
   Com o webhook ligado, a encomenda passa sozinha a "Pago" e a loja recebe o email "Encomenda PAGA". Os valores são sempre calculados no servidor, e cada webhook é validado pela assinatura do Stripe.
 
+## WhatsApp e chat de ajuda
+
+- **WhatsApp:** botão fixo no canto, e um botão "Confirmar no WhatsApp" depois de cada encomenda, com o número do pedido, cada peça (quantidade, tamanho, preço), o total, o pagamento e o nome. O número muda-se no painel (Loja & pagamentos → WhatsApp).
+- **Chat de ajuda:** responde logo, sem chave, com os dados reais da loja (peças, preços, tamanhos, envio, pagamentos, drop, contactos) e encaminha para o WhatsApp o que não sabe.
+  - **Opcional, com IA (Claude):** define `ANTHROPIC_API_KEY` na Vercel e volta a publicar. O modelo por omissão é `claude-opus-5-5`; `CHAT_MODEL=claude-haiku-5-5` fica bem mais barato. A IA só recebe informação pública da loja, nunca encomendas nem clientes, e está limitada a 30 mensagens por 10 minutos por visitante. Se a IA falhar, o chat volta sozinho às respostas locais.
+
 ## Área do gerente
 
 Clica **3 vezes seguidas na gota** do topo do site → login → painel (produtos, loja e pagamentos, drop, cupões, encomendas, backup).
