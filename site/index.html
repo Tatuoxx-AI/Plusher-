@@ -25,6 +25,7 @@ html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
 html.lenis,html.lenis body{height:auto}
 .lenis.lenis-smooth{scroll-behavior:auto!important}
 body{background:var(--bg);color:var(--txt);font-family:var(--fb);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+@supports (overflow:clip){ body{overflow-x:clip} } /* no Safari (iPhone) o hidden desligava o position:sticky do catálogo, zoom e destaques */
 img{display:block;max-width:100%}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:0}
@@ -347,7 +348,8 @@ footer.foot{background:var(--paper);border-top:1px solid rgba(255,255,255,.06);p
 
 /* ===================== TOAST + REVEAL ===================== */
 .toast{position:fixed;left:50%;bottom:24px;z-index:100;transform:translate(-50%,calc(100% + 40px));background:var(--acc);color:#000;font-weight:700;font-size:13px;padding:14px 18px;display:flex;gap:14px;align-items:center;transition:transform .5s var(--ease);max-width:calc(100% - 32px)}
-.toast.on{transform:translate(-50%,0)}
+.toast{visibility:hidden;transition:transform .5s var(--ease),visibility 0s .5s}
+.toast.on{transform:translate(-50%,0);visibility:visible;transition:transform .5s var(--ease)}
 .toast a{border-bottom:1.5px solid #000;white-space:nowrap}
 [data-r]{opacity:0;transform:translateY(40px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
 [data-r].in{opacity:1;transform:none}
@@ -420,6 +422,26 @@ footer.foot{background:var(--paper);border-top:1px solid rgba(255,255,255,.06);p
 .afoot{position:fixed;left:0;right:0;bottom:0;z-index:3;display:flex;align-items:center;gap:10px;padding:12px clamp(16px,3vw,32px);background:rgba(10,10,10,.96);border-top:1px solid var(--line)}
 .afoot .st{font-size:12px;color:var(--txt2);margin-right:auto}
 .afoot .st.dirty{color:var(--acc)}
+
+/* ===================== FUNDO DA GARAGEM (topo e fundo fixo das secções escuras) ===================== */
+body.fundo-garagem{background:#050505 url(fundo-garagem.webp) center/cover fixed}
+body.fundo-garagem .hero{background:linear-gradient(180deg,rgba(5,5,5,.55),rgba(5,5,5,.15) 45%,rgba(5,5,5,.8)),url(fundo-garagem.webp) center 58%/cover no-repeat #0b0b0b;color:#EDEDED}
+body.fundo-garagem .hero .swoosh{background:rgba(250,255,0,.06)}
+body.fundo-garagem #rain{filter:invert(1);opacity:.75}
+body.fundo-garagem .nav.on-yellow .logo{filter:none}
+body.fundo-garagem .hero-title{display:none}
+body.fundo-garagem .lab{background:rgba(5,5,5,.45);border-color:rgba(255,255,255,.22);color:#EDEDED}
+body.fundo-garagem .lab-h button{background:var(--acc);color:#000}
+body.fundo-garagem .lab input[type=range]{background:rgba(255,255,255,.35)}
+body.fundo-garagem .lab input[type=range]::-webkit-slider-thumb{background:var(--acc)}
+body.fundo-garagem .lab input[type=range]::-moz-range-thumb{background:var(--acc)}
+body.fundo-garagem .meter .bubble{border-color:#EDEDED}
+body.fundo-garagem .meter:before,body.fundo-garagem .hero .scroll-cue i{background:#EDEDED}
+body.fundo-garagem .drip:before{background:var(--acc)}
+body.fundo-garagem .hero-copy .btn-dark{background:var(--acc);color:#000}
+body.fundo-garagem .a3d-load{color:rgba(255,255,255,.6)}
+body.fundo-garagem .marquee,body.fundo-garagem .cat,body.fundo-garagem .mani{background:rgba(5,5,5,.8)}
+body.fundo-garagem footer.foot{background:rgba(10,10,10,.9)}
 
 /* ===================== ESCOLHA DE IDIOMA ===================== */
 .lang-gate{position:fixed;inset:0;z-index:200;background:var(--bg);display:grid;place-items:center;padding:24px;overflow:auto;opacity:0;transition:opacity .5s var(--ease)}
@@ -947,6 +969,9 @@ async function api(url, opts = {}){
   return data;
 }
 
+// fundo da garagem; ?fundo=amarelo mostra o topo amarelo original
+if (new URLSearchParams(location.search).get('fundo') !== 'amarelo') document.body.classList.add('fundo-garagem');
+
 /* ===================== IDIOMAS ===================== */
 /* O site escolhe o idioma à entrada (guardado neste navegador). As traduções usam como chave o texto
    português original: um texto que não esteja no dicionário (ex.: uma descrição nova editada no painel)
@@ -1472,7 +1497,7 @@ let catDist = 0;
 function sizeCatalog(){
   const tr = $('#track');
   catDist = Math.max(0, tr.scrollWidth - innerWidth);
-  $('#catalogo').style.height = (innerHeight + catDist) + 'px';
+  $('#catalogo').style.height = ($('#catalogo .stick').offsetHeight + catDist) + 'px';
 }
 
 /* ===================== CATEGORIAS ===================== */
@@ -1729,7 +1754,11 @@ document.addEventListener('click', e => {
 
 const nav = $('#nav');
 const yellowEls = () => [$('#hero'), ...$$('.drop'), $('.bag .left')];
-function progress(el){ const r = el.getBoundingClientRect(); return clamp(-r.top / (r.height - innerHeight)); }
+function progress(el){
+  const r = el.getBoundingClientRect();
+  const vh = el.querySelector(':scope > .stick')?.offsetHeight || innerHeight; // no iPhone a barra do Safari muda o innerHeight
+  return clamp(-r.top / Math.max(1, r.height - vh));
+}
 function onScroll(){
   const y = scrollY;
   nav.classList.toggle('up', y > 30);
