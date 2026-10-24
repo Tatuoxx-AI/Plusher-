@@ -1,21 +1,42 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "regions": ["cdg1"],
+  "regions": [
+    "cdg1"
+  ],
   "functions": {
-    "api/index.js": { "includeFiles": "site/**", "maxDuration": 15 }
+    "api/index.js": {
+      "includeFiles": "site/**",
+      "maxDuration": 15
+    }
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index?__p=$1" }
+    {
+      "source": "/(.*)",
+      "destination": "/api/index?__p=$1"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Referrer-Policy", "value": "same-origin" },
-        { "key": "Strict-Transport-Security", "value": "max-age=31536000" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000"
+        }
       ]
     }
-  ]
+  ],
+  "buildCommand": "npm run build"
 }

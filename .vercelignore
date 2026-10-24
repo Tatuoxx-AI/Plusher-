@@ -1,5 +1,4 @@
 data
 node_modules
 *.md
-scripts
 server.js

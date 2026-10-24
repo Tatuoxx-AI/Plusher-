@@ -9,10 +9,15 @@
   },
   "scripts": {
     "start": "node server.js",
-    "acesso": "node scripts/definir-acesso.js"
+    "acesso": "node scripts/definir-acesso.js",
+    "build": "node scripts/build.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.131.0",
     "@vercel/blob": "2.8.1"
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "5.9.0",
+    "terser": "5.51.2"
   }
 }
